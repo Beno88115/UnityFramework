@@ -1,7 +1,15 @@
 ﻿using GameFramework.UI;
+using System.Collections.Generic;
 
 public class UIFormHelper : IUIFormHelper 
 {
+    private Dictionary<string, UIGroup> m_Groups = null;
+
+    public UIFormHelper(Dictionary<string, UIGroup> groups)
+    {
+        this.m_Groups = groups;
+    }
+
     /// <summary>
     /// 实例化界面。
     /// </summary>

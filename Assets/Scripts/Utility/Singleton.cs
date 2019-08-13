@@ -4,25 +4,25 @@ using System.Reflection;
 public class Singleton<T> where T : class
 {
     /*  Instance  */
-    private static T instance;
+    private static T s_Instance;
 
     /* Serve the single instance to callers */
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if (s_Instance == null)
             {
-                instance = (T)Activator.CreateInstance(typeof(T), true);
+                s_Instance = (T)Activator.CreateInstance(typeof(T), true);
                 Type type = typeof(T);
                 MethodInfo mi = type.GetMethod("OnInit");
                 if (mi != null)
                 {
-                    mi.Invoke(instance, null);
+                    mi.Invoke(s_Instance, null);
                 }
             }
 
-            return instance;
+            return s_Instance;
         }
     }
 
@@ -33,10 +33,10 @@ public class Singleton<T> where T : class
         MethodInfo mi = type.GetMethod("OnDestroy");
         if (mi != null)
         {
-            mi.Invoke(instance, null);
+            mi.Invoke(s_Instance, null);
         }
 
-        instance = null;
+        s_Instance = null;
         return;
     }
 }

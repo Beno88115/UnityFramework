@@ -3,23 +3,41 @@ using GameFramework;
 
 public class AppFacade : SingletonMono<AppFacade>
 {
-    void Start()
+    protected override void Awake()
+    {
+        base.Awake();
+
+#if UNITY_5_6_OR_NEWER
+        Application.lowMemory += OnLowMemory;
+#endif
+    }
+
+    private void Start()
     {
     }
 
-    void Update()
+    public void Initialize()
     {
-        GameFrameworkEntry.Update(Time.time, Time.unscaledTime);
+        ResourceManager.Instance.Initialized();
+        UIManager.Instance.Initialize();
     }
 
-    public T GetModule<T>() where T : class
+    private void Update()
     {
-        return GameFrameworkEntry.GetModule<T>();
+        GameFrameworkEntry.Update(Time.deltaTime, Time.unscaledDeltaTime);
     }
 
-    void OnApplicationQuit()
+    private void OnDestroy()
     {
+#if UNITY_5_6_OR_NEWER
+        Application.lowMemory -= OnLowMemory;
+#endif
         GameFrameworkEntry.Shutdown();
+    }
+    
+    private void OnLowMemory()
+    {
+        // TODO:
     }
 
     protected override bool IsGlobalScope 
