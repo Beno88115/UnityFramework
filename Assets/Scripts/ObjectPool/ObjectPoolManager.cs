@@ -7,10 +7,8 @@ public class ObjectPoolManager : SingletonMono<ObjectPoolManager>
 {
     private GameFramework.ObjectPool.IObjectPoolManager m_ObjectPoolModule;
 
-    protected override void Awake()
+    public void Initialize()
     {
-        base.Awake();
-
         this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>();
     }
 }

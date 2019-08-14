@@ -7,6 +7,6 @@ public class Test : MonoBehaviour
     void Start()
     {
         AppFacade.Instance.Initialize();
-        UIManager.Instance.PushForm("UILogin");
+        // UIManager.Instance.PushForm("UILogin");
     }
 }

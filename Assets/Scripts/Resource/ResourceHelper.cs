@@ -9,7 +9,7 @@ public class ResourceHelper : IResourceHelper
     /// <param name="loadBytesCallback">读取数据流回调函数。</param>
     public void LoadBytes(string fileUri, LoadBytesCallback loadBytesCallback)
     {
-
+        UnityEngine.Debug.Log("==========fileuri:" + fileUri);
     }
 
     /// <summary>

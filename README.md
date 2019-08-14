@@ -1,4 +1,6 @@
-# git submodule update
+### 拉取thirdpart代码
+* git submodule init 
+* git submodule update
 
 ### Git Commit Message 格式
 

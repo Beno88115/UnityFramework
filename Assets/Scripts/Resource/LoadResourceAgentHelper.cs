@@ -64,7 +64,7 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// <param name="fullPath">要加载资源的完整路径名。</param>
     public void ReadFile(string fullPath)
     {
-
+        Debug.Log("========read file:" + fullPath);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// <param name="loadType">资源加载方式。</param>
     public void ReadBytes(string fullPath, int loadType)
     {
-
+        Debug.Log("========ReadBytes:" + fullPath);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// <param name="isScene">要加载的资源是否是场景。</param>
     public void LoadAsset(object resource, string assetName, Type assetType, bool isScene)
     {
-
+        Debug.Log("========LoadAsset:" + assetName);
     }
 
     /// <summary>
