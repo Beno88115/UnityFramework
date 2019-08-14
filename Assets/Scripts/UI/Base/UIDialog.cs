@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIDialog : UIForm 
+public class UIDialog : UIWindow 
 {
     protected virtual void Start()
     {

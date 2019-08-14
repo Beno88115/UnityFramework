@@ -1,6 +1,6 @@
 ﻿public enum UIGroupType
 {
-    UIForm = 1,
+    UIWindow = 1,
     UIDialog,
     UILoading,
     UITip,

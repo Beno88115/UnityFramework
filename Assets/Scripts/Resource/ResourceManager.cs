@@ -13,13 +13,14 @@ public class ResourceManager : SingletonMono<ResourceManager>
     {
         this.m_ResModule = GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceManager>();
         this.m_ResModule.SetResourceHelper(new ResourceHelper());
+        this.m_ResModule.SetResourceSimulationHelper(new ResourceSimulationHelper());
 
         this.m_ResModule.SetDownloadManager(GameFrameworkEntry.GetModule<GameFramework.Download.IDownloadManager>());
         this.m_ResModule.SetObjectPoolManager(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>());
 
         this.m_ResModule.SetReadOnlyPath(Application.streamingAssetsPath);
         this.m_ResModule.SetReadWritePath(Application.persistentDataPath);
-        this.m_ResModule.SetResourceMode(GameFramework.Resource.ResourceMode.Package);
+        this.m_ResModule.SetResourceMode(GameFramework.Resource.ResourceMode.Simulation);
 
         this.m_ResModule.ResourceUpdateStart += OnResourceUpdateStart;
         this.m_ResModule.ResourceUpdateChanged += OnResourceUpdateChanged;
@@ -34,9 +35,7 @@ public class ResourceManager : SingletonMono<ResourceManager>
 
     public void InitResources()
     {
-        m_ResModule.InitResources(()=>{
-            Debug.Log("======init resources");
-        });
+        m_ResModule.InitResources();
     }
 
     private void OnResourceUpdateStart(object sender, GameFramework.Resource.ResourceUpdateStartEventArgs e)
