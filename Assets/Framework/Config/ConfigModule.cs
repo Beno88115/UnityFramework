@@ -13,107 +13,107 @@ using System.IO;
 namespace GameFramework.Config
 {
     /// <summary>
-    /// 配置管理器。
+    /// 数据表管理器。
     /// </summary>
     internal sealed partial class ConfigModule : GameFrameworkModule, IConfigModule
     {
-        private readonly Dictionary<string, ConfigData> m_ConfigDatas;
+        private readonly Dictionary<string, ConfigTableBase> m_ConfigTables;
         private readonly LoadAssetCallbacks m_LoadAssetCallbacks;
         private IResourceModule m_ResourceModule;
         private IConfigHelper m_ConfigHelper;
-        private EventHandler<LoadConfigSuccessEventArgs> m_LoadConfigSuccessEventHandler;
-        private EventHandler<LoadConfigFailureEventArgs> m_LoadConfigFailureEventHandler;
-        private EventHandler<LoadConfigUpdateEventArgs> m_LoadConfigUpdateEventHandler;
-        private EventHandler<LoadConfigDependencyAssetEventArgs> m_LoadConfigDependencyAssetEventHandler;
+        private EventHandler<LoadConfigSuccessEventArgs> m_ConfigSuccessEventHandler;
+        private EventHandler<LoadConfigFailureEventArgs> m_ConfigFailureEventHandler;
+        private EventHandler<LoadConfigUpdateEventArgs> m_ConfigUpdateEventHandler;
+        private EventHandler<LoadConfigDependencyAssetEventArgs> m_ConfigDependencyAssetEventHandler;
 
         /// <summary>
-        /// 初始化配置管理器的新实例。
+        /// 初始化数据表管理器的新实例。
         /// </summary>
         public ConfigModule()
         {
-            m_ConfigDatas = new Dictionary<string, ConfigData>();
-            m_LoadAssetCallbacks = new LoadAssetCallbacks(LoadConfigSuccessCallback, LoadConfigFailureCallback, LoadConfigUpdateCallback, LoadConfigDependencyAssetCallback);
+            m_ConfigTables = new Dictionary<string, ConfigTableBase>();
+            m_LoadAssetCallbacks = new LoadAssetCallbacks(LoadConfigTableSuccessCallback, LoadConfigTableFailureCallback, LoadConfigTableUpdateCallback, LoadConfigTableDependencyAssetCallback);
             m_ResourceModule = null;
             m_ConfigHelper = null;
-            m_LoadConfigSuccessEventHandler = null;
-            m_LoadConfigFailureEventHandler = null;
-            m_LoadConfigUpdateEventHandler = null;
-            m_LoadConfigDependencyAssetEventHandler = null;
+            m_ConfigSuccessEventHandler = null;
+            m_ConfigFailureEventHandler = null;
+            m_ConfigUpdateEventHandler = null;
+            m_ConfigDependencyAssetEventHandler = null;
         }
 
         /// <summary>
-        /// 获取配置数量。
+        /// 获取数据表数量。
         /// </summary>
-        public int ConfigCount
+        public int Count
         {
             get
             {
-                return m_ConfigDatas.Count;
+                return m_ConfigTables.Count;
             }
         }
 
         /// <summary>
-        /// 加载配置成功事件。
+        /// 加载数据表成功事件。
         /// </summary>
         public event EventHandler<LoadConfigSuccessEventArgs> LoadConfigSuccess
         {
             add
             {
-                m_LoadConfigSuccessEventHandler += value;
+                m_ConfigSuccessEventHandler += value;
             }
             remove
             {
-                m_LoadConfigSuccessEventHandler -= value;
+                m_ConfigSuccessEventHandler -= value;
             }
         }
 
         /// <summary>
-        /// 加载配置失败事件。
+        /// 加载数据表失败事件。
         /// </summary>
         public event EventHandler<LoadConfigFailureEventArgs> LoadConfigFailure
         {
             add
             {
-                m_LoadConfigFailureEventHandler += value;
+                m_ConfigFailureEventHandler += value;
             }
             remove
             {
-                m_LoadConfigFailureEventHandler -= value;
+                m_ConfigFailureEventHandler -= value;
             }
         }
 
         /// <summary>
-        /// 加载配置更新事件。
+        /// 加载数据表更新事件。
         /// </summary>
         public event EventHandler<LoadConfigUpdateEventArgs> LoadConfigUpdate
         {
             add
             {
-                m_LoadConfigUpdateEventHandler += value;
+                m_ConfigUpdateEventHandler += value;
             }
             remove
             {
-                m_LoadConfigUpdateEventHandler -= value;
+                m_ConfigUpdateEventHandler -= value;
             }
         }
 
         /// <summary>
-        /// 加载配置时加载依赖资源事件。
+        /// 加载数据表时加载依赖资源事件。
         /// </summary>
         public event EventHandler<LoadConfigDependencyAssetEventArgs> LoadConfigDependencyAsset
         {
             add
             {
-                m_LoadConfigDependencyAssetEventHandler += value;
+                m_ConfigDependencyAssetEventHandler += value;
             }
             remove
             {
-                m_LoadConfigDependencyAssetEventHandler -= value;
+                m_ConfigDependencyAssetEventHandler -= value;
             }
         }
 
         /// <summary>
-        /// 配置管理器轮询。
+        /// 数据表管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
@@ -122,10 +122,16 @@ namespace GameFramework.Config
         }
 
         /// <summary>
-        /// 关闭并清理配置管理器。
+        /// 关闭并清理数据表管理器。
         /// </summary>
         internal override void Shutdown()
         {
+            foreach (KeyValuePair<string, ConfigTableBase> configTable in m_ConfigTables)
+            {
+                configTable.Value.Shutdown();
+            }
+
+            m_ConfigTables.Clear();
         }
 
         /// <summary>
@@ -143,59 +149,59 @@ namespace GameFramework.Config
         }
 
         /// <summary>
-        /// 设置配置辅助器。
+        /// 设置数据表辅助器。
         /// </summary>
-        /// <param name="configHelper">配置辅助器。</param>
-        public void SetConfigHelper(IConfigHelper configHelper)
+        /// <param name="configTableHelper">数据表辅助器。</param>
+        public void SetConfigHelper(IConfigHelper configTableHelper)
         {
-            if (configHelper == null)
+            if (configTableHelper == null)
             {
-                throw new GameFrameworkException("Config helper is invalid.");
+                throw new GameFrameworkException("Data table helper is invalid.");
             }
 
-            m_ConfigHelper = configHelper;
+            m_ConfigHelper = configTableHelper;
         }
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        public void LoadConfig(string configAssetName, LoadType loadType)
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        public void LoadConfigTable(string configTableAssetName, LoadType loadType)
         {
-            LoadConfig(configAssetName, loadType, Constant.DefaultPriority, null);
+            LoadConfigTable(configTableAssetName, loadType, Constant.DefaultPriority, null);
         }
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        /// <param name="priority">加载配置资源的优先级。</param>
-        public void LoadConfig(string configAssetName, LoadType loadType, int priority)
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        /// <param name="priority">加载数据表资源的优先级。</param>
+        public void LoadConfigTable(string configTableAssetName, LoadType loadType, int priority)
         {
-            LoadConfig(configAssetName, loadType, priority, null);
+            LoadConfigTable(configTableAssetName, loadType, priority, null);
         }
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void LoadConfig(string configAssetName, LoadType loadType, object userData)
+        public void LoadConfigTable(string configTableAssetName, LoadType loadType, object userData)
         {
-            LoadConfig(configAssetName, loadType, Constant.DefaultPriority, userData);
+            LoadConfigTable(configTableAssetName, loadType, Constant.DefaultPriority, userData);
         }
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        /// <param name="priority">加载配置资源的优先级。</param>
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        /// <param name="priority">加载数据表资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        public void LoadConfig(string configAssetName, LoadType loadType, int priority, object userData)
+        public void LoadConfigTable(string configTableAssetName, LoadType loadType, int priority, object userData)
         {
             if (m_ResourceModule == null)
             {
@@ -204,330 +210,599 @@ namespace GameFramework.Config
 
             if (m_ConfigHelper == null)
             {
-                throw new GameFrameworkException("You must set config helper first.");
+                throw new GameFrameworkException("You must set data table helper first.");
             }
 
-            m_ResourceModule.LoadAsset(configAssetName, priority, m_LoadAssetCallbacks, LoadConfigInfo.Create(loadType, userData));
+            m_ResourceModule.LoadAsset(configTableAssetName, priority, m_LoadAssetCallbacks, LoadConfigTableInfo.Create(loadType, userData));
         }
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="text">要解析的配置文本。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(string text)
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <returns>是否存在数据表。</returns>
+        public bool HasConfigTable<T>() where T : IConfigRow
         {
-            return ParseConfig(text, null);
+            return InternalHasConfigTable(Utility.Text.GetFullName<T>(string.Empty));
         }
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="text">要解析的配置文本。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(string text, object userData)
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <returns>是否存在数据表。</returns>
+        public bool HasConfigTable(Type dataRowType)
         {
-            if (m_ConfigHelper == null)
+            if (dataRowType == null)
             {
-                throw new GameFrameworkException("You must set config helper first.");
+                throw new GameFrameworkException("Data row type is invalid.");
             }
 
-            try
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
             {
-                return m_ConfigHelper.ParseConfig(text, userData);
-            }
-            catch (Exception exception)
-            {
-                if (exception is GameFrameworkException)
-                {
-                    throw;
-                }
-
-                throw new GameFrameworkException(Utility.Text.Format("Can not parse config with exception '{0}'.", exception.ToString()), exception);
-            }
-        }
-
-        /// <summary>
-        /// 解析配置。
-        /// </summary>
-        /// <param name="bytes">要解析的配置二进制流。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(byte[] bytes)
-        {
-            return ParseConfig(bytes, null);
-        }
-
-        /// <summary>
-        /// 解析配置。
-        /// </summary>
-        /// <param name="bytes">要解析的配置二进制流。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(byte[] bytes, object userData)
-        {
-            if (m_ConfigHelper == null)
-            {
-                throw new GameFrameworkException("You must set config helper first.");
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
             }
 
-            try
-            {
-                return m_ConfigHelper.ParseConfig(bytes, userData);
-            }
-            catch (Exception exception)
-            {
-                if (exception is GameFrameworkException)
-                {
-                    throw;
-                }
-
-                throw new GameFrameworkException(Utility.Text.Format("Can not parse config with exception '{0}'.", exception.ToString()), exception);
-            }
+            return InternalHasConfigTable(Utility.Text.GetFullName(dataRowType, string.Empty));
         }
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="stream">要解析的配置二进制流。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(Stream stream)
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否存在数据表。</returns>
+        public bool HasConfigTable<T>(string name) where T : IConfigRow
         {
-            return ParseConfig(stream, null);
+            return InternalHasConfigTable(Utility.Text.GetFullName<T>(name));
         }
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="stream">要解析的配置二进制流。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        public bool ParseConfig(Stream stream, object userData)
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否存在数据表。</returns>
+        public bool HasConfigTable(Type dataRowType, string name)
         {
-            if (m_ConfigHelper == null)
+            if (dataRowType == null)
             {
-                throw new GameFrameworkException("You must set config helper first.");
+                throw new GameFrameworkException("Data row type is invalid.");
             }
 
-            try
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
             {
-                return m_ConfigHelper.ParseConfig(stream, userData);
-            }
-            catch (Exception exception)
-            {
-                if (exception is GameFrameworkException)
-                {
-                    throw;
-                }
-
-                throw new GameFrameworkException(Utility.Text.Format("Can not parse config with exception '{0}'.", exception.ToString()), exception);
-            }
-        }
-
-        /// <summary>
-        /// 检查是否存在指定配置项。
-        /// </summary>
-        /// <param name="configName">要检查配置项的名称。</param>
-        /// <returns>指定的配置项是否存在。</returns>
-        public bool HasConfig(string configName)
-        {
-            return GetConfigData(configName).HasValue;
-        }
-
-        /// <summary>
-        /// 增加指定配置项。
-        /// </summary>
-        /// <param name="configName">要增加配置项的名称。</param>
-        /// <param name="boolValue">配置项布尔值。</param>
-        /// <param name="intValue">配置项整数值。</param>
-        /// <param name="floatValue">配置项浮点数值。</param>
-        /// <param name="stringValue">配置项字符串值。</param>
-        /// <returns>是否增加配置项成功。</returns>
-        public bool AddConfig(string configName, bool boolValue, int intValue, float floatValue, string stringValue)
-        {
-            if (HasConfig(configName))
-            {
-                return false;
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
             }
 
-            m_ConfigDatas.Add(configName, new ConfigData(boolValue, intValue, floatValue, stringValue));
-            return true;
+            return InternalHasConfigTable(Utility.Text.GetFullName(dataRowType, name));
         }
 
         /// <summary>
-        /// 移除指定配置项。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="configName">要移除配置项的名称。</param>
-        public void RemoveConfig(string configName)
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <returns>要获取的数据表。</returns>
+        public IConfigTable<T> GetConfigTable<T>() where T : IConfigRow
         {
-            m_ConfigDatas.Remove(configName);
+            return (IConfigTable<T>)InternalGetConfigTable(Utility.Text.GetFullName<T>(string.Empty));
         }
 
         /// <summary>
-        /// 清空所有配置项。
+        /// 获取数据表。
         /// </summary>
-        public void RemoveAllConfigs()
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <returns>要获取的数据表。</returns>
+        public ConfigTableBase GetConfigTable(Type dataRowType)
         {
-            m_ConfigDatas.Clear();
-        }
-
-        /// <summary>
-        /// 从指定配置项中读取布尔值。
-        /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的布尔值。</returns>
-        public bool GetBool(string configName)
-        {
-            ConfigData? configData = GetConfigData(configName);
-            if (!configData.HasValue)
+            if (dataRowType == null)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Config name '{0}' is not exist.", configName));
+                throw new GameFrameworkException("Data row type is invalid.");
             }
 
-            return configData.Value.BoolValue;
-        }
-
-        /// <summary>
-        /// 从指定配置项中读取布尔值。
-        /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的布尔值。</returns>
-        public bool GetBool(string configName, bool defaultValue)
-        {
-            ConfigData? configData = GetConfigData(configName);
-            return configData.HasValue ? configData.Value.BoolValue : defaultValue;
-        }
-
-        /// <summary>
-        /// 从指定配置项中读取整数值。
-        /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的整数值。</returns>
-        public int GetInt(string configName)
-        {
-            ConfigData? configData = GetConfigData(configName);
-            if (!configData.HasValue)
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Config name '{0}' is not exist.", configName));
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
             }
 
-            return configData.Value.IntValue;
+            return InternalGetConfigTable(Utility.Text.GetFullName(dataRowType, string.Empty));
         }
 
         /// <summary>
-        /// 从指定配置项中读取整数值。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的整数值。</returns>
-        public int GetInt(string configName, int defaultValue)
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>要获取的数据表。</returns>
+        public IConfigTable<T> GetConfigTable<T>(string name) where T : IConfigRow
         {
-            ConfigData? configData = GetConfigData(configName);
-            return configData.HasValue ? configData.Value.IntValue : defaultValue;
+            return (IConfigTable<T>)InternalGetConfigTable(Utility.Text.GetFullName<T>(name));
         }
 
         /// <summary>
-        /// 从指定配置项中读取浮点数值。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的浮点数值。</returns>
-        public float GetFloat(string configName)
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>要获取的数据表。</returns>
+        public ConfigTableBase GetConfigTable(Type dataRowType, string name)
         {
-            ConfigData? configData = GetConfigData(configName);
-            if (!configData.HasValue)
+            if (dataRowType == null)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Config name '{0}' is not exist.", configName));
+                throw new GameFrameworkException("Data row type is invalid.");
             }
 
-            return configData.Value.FloatValue;
-        }
-
-        /// <summary>
-        /// 从指定配置项中读取浮点数值。
-        /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的浮点数值。</returns>
-        public float GetFloat(string configName, float defaultValue)
-        {
-            ConfigData? configData = GetConfigData(configName);
-            return configData.HasValue ? configData.Value.FloatValue : defaultValue;
-        }
-
-        /// <summary>
-        /// 从指定配置项中读取字符串值。
-        /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的字符串值。</returns>
-        public string GetString(string configName)
-        {
-            ConfigData? configData = GetConfigData(configName);
-            if (!configData.HasValue)
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Config name '{0}' is not exist.", configName));
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
             }
 
-            return configData.Value.StringValue;
+            return InternalGetConfigTable(Utility.Text.GetFullName(dataRowType, name));
         }
 
         /// <summary>
-        /// 从指定配置项中读取字符串值。
+        /// 获取所有数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的字符串值。</returns>
-        public string GetString(string configName, string defaultValue)
+        /// <returns>所有数据表。</returns>
+        public ConfigTableBase[] GetAllConfigTables()
         {
-            ConfigData? configData = GetConfigData(configName);
-            return configData.HasValue ? configData.Value.StringValue : defaultValue;
-        }
-
-        private ConfigData? GetConfigData(string configName)
-        {
-            if (string.IsNullOrEmpty(configName))
+            int index = 0;
+            ConfigTableBase[] results = new ConfigTableBase[m_ConfigTables.Count];
+            foreach (KeyValuePair<string, ConfigTableBase> configTable in m_ConfigTables)
             {
-                throw new GameFrameworkException("Config name is invalid.");
+                results[index++] = configTable.Value;
             }
 
-            ConfigData configData = default(ConfigData);
-            if (m_ConfigDatas.TryGetValue(configName, out configData))
+            return results;
+        }
+
+        /// <summary>
+        /// 获取所有数据表。
+        /// </summary>
+        /// <param name="results">所有数据表。</param>
+        public void GetAllConfigTables(List<ConfigTableBase> results)
+        {
+            if (results == null)
             {
-                return configData;
+                throw new GameFrameworkException("Results is invalid.");
+            }
+
+            results.Clear();
+            foreach (KeyValuePair<string, ConfigTableBase> configTable in m_ConfigTables)
+            {
+                results.Add(configTable.Value);
+            }
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(string text) where T : class, IConfigRow, new()
+        {
+            return CreateConfigTable<T>(string.Empty, text);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, string text)
+        {
+            return CreateConfigTable(dataRowType, string.Empty, text);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(string name, string text) where T : class, IConfigRow, new()
+        {
+            if (HasConfigTable<T>(name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+            }
+
+            ConfigTable<T> configTable = new ConfigTable<T>(name);
+            InternalCreateConfigTable(configTable, text);
+            m_ConfigTables.Add(Utility.Text.GetFullName<T>(name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, string name, string text)
+        {
+            if (dataRowType == null)
+            {
+                throw new GameFrameworkException("Data row type is invalid.");
+            }
+
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+            }
+
+            if (HasConfigTable(dataRowType, name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+            }
+
+            Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
+            ConfigTableBase configTable = (ConfigTableBase)Activator.CreateInstance(configTableType, name);
+            InternalCreateConfigTable(configTable, text);
+            m_ConfigTables.Add(Utility.Text.GetFullName(dataRowType, name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(byte[] bytes) where T : class, IConfigRow, new()
+        {
+            return CreateConfigTable<T>(string.Empty, bytes);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, byte[] bytes)
+        {
+            return CreateConfigTable(dataRowType, string.Empty, bytes);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(string name, byte[] bytes) where T : class, IConfigRow, new()
+        {
+            if (HasConfigTable<T>(name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+            }
+
+            ConfigTable<T> configTable = new ConfigTable<T>(name);
+            InternalCreateConfigTable(configTable, bytes);
+            m_ConfigTables.Add(Utility.Text.GetFullName<T>(name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, string name, byte[] bytes)
+        {
+            if (dataRowType == null)
+            {
+                throw new GameFrameworkException("Data row type is invalid.");
+            }
+
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+            }
+
+            if (HasConfigTable(dataRowType, name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+            }
+
+            Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
+            ConfigTableBase configTable = (ConfigTableBase)Activator.CreateInstance(configTableType, name);
+            InternalCreateConfigTable(configTable, bytes);
+            m_ConfigTables.Add(Utility.Text.GetFullName(dataRowType, name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(Stream stream) where T : class, IConfigRow, new()
+        {
+            return CreateConfigTable<T>(string.Empty, stream);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, Stream stream)
+        {
+            return CreateConfigTable(dataRowType, string.Empty, stream);
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public IConfigTable<T> CreateConfigTable<T>(string name, Stream stream) where T : class, IConfigRow, new()
+        {
+            if (HasConfigTable<T>(name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+            }
+
+            ConfigTable<T> configTable = new ConfigTable<T>(name);
+            InternalCreateConfigTable(configTable, stream);
+            m_ConfigTables.Add(Utility.Text.GetFullName<T>(name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        public ConfigTableBase CreateConfigTable(Type dataRowType, string name, Stream stream)
+        {
+            if (dataRowType == null)
+            {
+                throw new GameFrameworkException("Data row type is invalid.");
+            }
+
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+            }
+
+            if (HasConfigTable(dataRowType, name))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+            }
+
+            Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
+            ConfigTableBase configTable = (ConfigTableBase)Activator.CreateInstance(configTableType, name);
+            InternalCreateConfigTable(configTable, stream);
+            m_ConfigTables.Add(Utility.Text.GetFullName(dataRowType, name), configTable);
+            return configTable;
+        }
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        public bool DestroyConfigTable<T>() where T : IConfigRow
+        {
+            return InternalDestroyConfigTable(Utility.Text.GetFullName<T>(string.Empty));
+        }
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <returns>是否销毁数据表成功。</returns>
+        public bool DestroyConfigTable(Type dataRowType)
+        {
+            if (dataRowType == null)
+            {
+                throw new GameFrameworkException("Data row type is invalid.");
+            }
+
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+            }
+
+            return InternalDestroyConfigTable(Utility.Text.GetFullName(dataRowType, string.Empty));
+        }
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        public bool DestroyConfigTable<T>(string name) where T : IConfigRow
+        {
+            return InternalDestroyConfigTable(Utility.Text.GetFullName<T>(name));
+        }
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否销毁数据表成功。</returns>
+        public bool DestroyConfigTable(Type dataRowType, string name)
+        {
+            if (dataRowType == null)
+            {
+                throw new GameFrameworkException("Data row type is invalid.");
+            }
+
+            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            {
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+            }
+
+            return InternalDestroyConfigTable(Utility.Text.GetFullName(dataRowType, name));
+        }
+
+        private bool InternalHasConfigTable(string fullName)
+        {
+            return m_ConfigTables.ContainsKey(fullName);
+        }
+
+        private ConfigTableBase InternalGetConfigTable(string fullName)
+        {
+            ConfigTableBase configTable = null;
+            if (m_ConfigTables.TryGetValue(fullName, out configTable))
+            {
+                return configTable;
             }
 
             return null;
         }
 
-        private void LoadConfigSuccessCallback(string configAssetName, object configAsset, float duration, object userData)
+        private void InternalCreateConfigTable(ConfigTableBase configTable, string text)
         {
-            LoadConfigInfo loadConfigInfo = (LoadConfigInfo)userData;
-            if (loadConfigInfo == null)
+            IEnumerable<GameFrameworkSegment<string>> dataRowSegments = null;
+            try
             {
-                throw new GameFrameworkException("Load config info is invalid.");
+                dataRowSegments = m_ConfigHelper.GetDataRowSegments(text);
+            }
+            catch (Exception exception)
+            {
+                if (exception is GameFrameworkException)
+                {
+                    throw;
+                }
+
+                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+            }
+
+            if (dataRowSegments == null)
+            {
+                throw new GameFrameworkException("Data row segments is invalid.");
+            }
+
+            foreach (GameFrameworkSegment<string> dataRowSegment in dataRowSegments)
+            {
+                if (!configTable.AddConfigRow(dataRowSegment))
+                {
+                    throw new GameFrameworkException("Add data row failure.");
+                }
+            }
+        }
+
+        private void InternalCreateConfigTable(ConfigTableBase configTable, byte[] bytes)
+        {
+            IEnumerable<GameFrameworkSegment<byte[]>> dataRowSegments = null;
+            try
+            {
+                dataRowSegments = m_ConfigHelper.GetDataRowSegments(bytes);
+            }
+            catch (Exception exception)
+            {
+                if (exception is GameFrameworkException)
+                {
+                    throw;
+                }
+
+                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+            }
+
+            if (dataRowSegments == null)
+            {
+                throw new GameFrameworkException("Data row segments is invalid.");
+            }
+
+            foreach (GameFrameworkSegment<byte[]> dataRowSegment in dataRowSegments)
+            {
+                if (!configTable.AddConfigRow(dataRowSegment))
+                {
+                    throw new GameFrameworkException("Add data row failure.");
+                }
+            }
+        }
+
+        private void InternalCreateConfigTable(ConfigTableBase configTable, Stream stream)
+        {
+            IEnumerable<GameFrameworkSegment<Stream>> dataRowSegments = null;
+            try
+            {
+                dataRowSegments = m_ConfigHelper.GetDataRowSegments(stream);
+            }
+            catch (Exception exception)
+            {
+                if (exception is GameFrameworkException)
+                {
+                    throw;
+                }
+
+                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+            }
+
+            if (dataRowSegments == null)
+            {
+                throw new GameFrameworkException("Data row segments is invalid.");
+            }
+
+            foreach (GameFrameworkSegment<Stream> dataRowSegment in dataRowSegments)
+            {
+                if (!configTable.AddConfigRow(dataRowSegment))
+                {
+                    throw new GameFrameworkException("Add data row failure.");
+                }
+            }
+        }
+
+        private bool InternalDestroyConfigTable(string fullName)
+        {
+            ConfigTableBase configTable = null;
+            if (m_ConfigTables.TryGetValue(fullName, out configTable))
+            {
+                configTable.Shutdown();
+                return m_ConfigTables.Remove(fullName);
+            }
+
+            return false;
+        }
+
+        private void LoadConfigTableSuccessCallback(string configTableAssetName, object configTableAsset, float duration, object userData)
+        {
+            LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
+            if (loadConfigTableInfo == null)
+            {
+                throw new GameFrameworkException("Load data table info is invalid.");
             }
 
             try
             {
-                if (!m_ConfigHelper.LoadConfig(configAsset, loadConfigInfo.LoadType, loadConfigInfo.UserData))
+                if (!m_ConfigHelper.LoadConfigTable(configTableAsset, loadConfigTableInfo.LoadType, loadConfigTableInfo.UserData))
                 {
-                    throw new GameFrameworkException(Utility.Text.Format("Load config failure in helper, asset name '{0}'.", configAssetName));
+                    throw new GameFrameworkException(Utility.Text.Format("Load data table failure in helper, asset name '{0}'.", configTableAssetName));
                 }
 
-                if (m_LoadConfigSuccessEventHandler != null)
+                if (m_ConfigSuccessEventHandler != null)
                 {
-                    LoadConfigSuccessEventArgs loadConfigSuccessEventArgs = LoadConfigSuccessEventArgs.Create(configAssetName, loadConfigInfo.LoadType, duration, loadConfigInfo.UserData);
-                    m_LoadConfigSuccessEventHandler(this, loadConfigSuccessEventArgs);
-                    ReferencePool.Release(loadConfigSuccessEventArgs);
+                    LoadConfigSuccessEventArgs loadConfigTableSuccessEventArgs = LoadConfigSuccessEventArgs.Create(configTableAssetName, loadConfigTableInfo.LoadType, duration, loadConfigTableInfo.UserData);
+                    m_ConfigSuccessEventHandler(this, loadConfigTableSuccessEventArgs);
+                    ReferencePool.Release(loadConfigTableSuccessEventArgs);
                 }
             }
             catch (Exception exception)
             {
-                if (m_LoadConfigFailureEventHandler != null)
+                if (m_ConfigFailureEventHandler != null)
                 {
-                    LoadConfigFailureEventArgs loadConfigFailureEventArgs = LoadConfigFailureEventArgs.Create(configAssetName, loadConfigInfo.LoadType, exception.ToString(), loadConfigInfo.UserData);
-                    m_LoadConfigFailureEventHandler(this, loadConfigFailureEventArgs);
-                    ReferencePool.Release(loadConfigFailureEventArgs);
+                    LoadConfigFailureEventArgs loadConfigTableFailureEventArgs = LoadConfigFailureEventArgs.Create(configTableAssetName, loadConfigTableInfo.LoadType, exception.ToString(), loadConfigTableInfo.UserData);
+                    m_ConfigFailureEventHandler(this, loadConfigTableFailureEventArgs);
+                    ReferencePool.Release(loadConfigTableFailureEventArgs);
                     return;
                 }
 
@@ -535,62 +810,62 @@ namespace GameFramework.Config
             }
             finally
             {
-                ReferencePool.Release(loadConfigInfo);
-                m_ConfigHelper.ReleaseConfigAsset(configAsset);
+                ReferencePool.Release(loadConfigTableInfo);
+                m_ConfigHelper.ReleaseConfigTableAsset(configTableAsset);
             }
         }
 
-        private void LoadConfigFailureCallback(string configAssetName, LoadResourceStatus status, string errorMessage, object userData)
+        private void LoadConfigTableFailureCallback(string configTableAssetName, LoadResourceStatus status, string errorMessage, object userData)
         {
-            LoadConfigInfo loadConfigInfo = (LoadConfigInfo)userData;
-            if (loadConfigInfo == null)
+            LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
+            if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load config info is invalid.");
+                throw new GameFrameworkException("Load data table info is invalid.");
             }
 
-            string appendErrorMessage = Utility.Text.Format("Load config failure, asset name '{0}', status '{1}', error message '{2}'.", configAssetName, status.ToString(), errorMessage);
-            if (m_LoadConfigFailureEventHandler != null)
+            string appendErrorMessage = Utility.Text.Format("Load data table failure, asset name '{0}', status '{1}', error message '{2}'.", configTableAssetName, status.ToString(), errorMessage);
+            if (m_ConfigFailureEventHandler != null)
             {
-                LoadConfigFailureEventArgs loadConfigFailureEventArgs = LoadConfigFailureEventArgs.Create(configAssetName, loadConfigInfo.LoadType, appendErrorMessage, loadConfigInfo.UserData);
-                m_LoadConfigFailureEventHandler(this, loadConfigFailureEventArgs);
-                ReferencePool.Release(loadConfigFailureEventArgs);
-                ReferencePool.Release(loadConfigInfo);
+                LoadConfigFailureEventArgs loadConfigTableFailureEventArgs = LoadConfigFailureEventArgs.Create(configTableAssetName, loadConfigTableInfo.LoadType, appendErrorMessage, loadConfigTableInfo.UserData);
+                m_ConfigFailureEventHandler(this, loadConfigTableFailureEventArgs);
+                ReferencePool.Release(loadConfigTableFailureEventArgs);
+                ReferencePool.Release(loadConfigTableInfo);
                 return;
             }
 
-            ReferencePool.Release(loadConfigInfo);
+            ReferencePool.Release(loadConfigTableInfo);
             throw new GameFrameworkException(appendErrorMessage);
         }
 
-        private void LoadConfigUpdateCallback(string configAssetName, float progress, object userData)
+        private void LoadConfigTableUpdateCallback(string configTableAssetName, float progress, object userData)
         {
-            LoadConfigInfo loadConfigInfo = (LoadConfigInfo)userData;
-            if (loadConfigInfo == null)
+            LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
+            if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load config info is invalid.");
+                throw new GameFrameworkException("Load data table info is invalid.");
             }
 
-            if (m_LoadConfigUpdateEventHandler != null)
+            if (m_ConfigUpdateEventHandler != null)
             {
-                LoadConfigUpdateEventArgs loadConfigUpdateEventArgs = LoadConfigUpdateEventArgs.Create(configAssetName, loadConfigInfo.LoadType, progress, loadConfigInfo.UserData);
-                m_LoadConfigUpdateEventHandler(this, loadConfigUpdateEventArgs);
-                ReferencePool.Release(loadConfigUpdateEventArgs);
+                LoadConfigUpdateEventArgs loadConfigTableUpdateEventArgs = LoadConfigUpdateEventArgs.Create(configTableAssetName, loadConfigTableInfo.LoadType, progress, loadConfigTableInfo.UserData);
+                m_ConfigUpdateEventHandler(this, loadConfigTableUpdateEventArgs);
+                ReferencePool.Release(loadConfigTableUpdateEventArgs);
             }
         }
 
-        private void LoadConfigDependencyAssetCallback(string configAssetName, string dependencyAssetName, int loadedCount, int totalCount, object userData)
+        private void LoadConfigTableDependencyAssetCallback(string configTableAssetName, string dependencyAssetName, int loadedCount, int totalCount, object userData)
         {
-            LoadConfigInfo loadConfigInfo = (LoadConfigInfo)userData;
-            if (loadConfigInfo == null)
+            LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
+            if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load config info is invalid.");
+                throw new GameFrameworkException("Load data table info is invalid.");
             }
 
-            if (m_LoadConfigDependencyAssetEventHandler != null)
+            if (m_ConfigDependencyAssetEventHandler != null)
             {
-                LoadConfigDependencyAssetEventArgs loadConfigDependencyAssetEventArgs = LoadConfigDependencyAssetEventArgs.Create(configAssetName, dependencyAssetName, loadedCount, totalCount, loadConfigInfo.UserData);
-                m_LoadConfigDependencyAssetEventHandler(this, loadConfigDependencyAssetEventArgs);
-                ReferencePool.Release(loadConfigDependencyAssetEventArgs);
+                LoadConfigDependencyAssetEventArgs loadConfigTableDependencyAssetEventArgs = LoadConfigDependencyAssetEventArgs.Create(configTableAssetName, dependencyAssetName, loadedCount, totalCount, loadConfigTableInfo.UserData);
+                m_ConfigDependencyAssetEventHandler(this, loadConfigTableDependencyAssetEventArgs);
+                ReferencePool.Release(loadConfigTableDependencyAssetEventArgs);
             }
         }
     }

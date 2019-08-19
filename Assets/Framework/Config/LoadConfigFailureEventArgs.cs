@@ -8,32 +8,32 @@
 namespace GameFramework.Config
 {
     /// <summary>
-    /// 加载配置失败事件。
+    /// 加载数据表失败事件。
     /// </summary>
     public sealed class LoadConfigFailureEventArgs : GameFrameworkEventArgs
     {
         /// <summary>
-        /// 初始化加载配置失败事件的新实例。
+        /// 初始化加载数据表失败事件的新实例。
         /// </summary>
         public LoadConfigFailureEventArgs()
         {
-            ConfigAssetName = null;
+            ConfigTableAssetName = null;
             LoadType = LoadType.Text;
             ErrorMessage = null;
             UserData = null;
         }
 
         /// <summary>
-        /// 获取配置资源名称。
+        /// 获取数据表资源名称。
         /// </summary>
-        public string ConfigAssetName
+        public string ConfigTableAssetName
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// 获取配置加载方式。
+        /// 获取数据表加载方式。
         /// </summary>
         public LoadType LoadType
         {
@@ -60,29 +60,29 @@ namespace GameFramework.Config
         }
 
         /// <summary>
-        /// 创建加载配置失败事件。
+        /// 创建加载数据表失败事件。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
+        /// <param name="dataTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
         /// <param name="errorMessage">错误信息。</param>
         /// <param name="userData">用户自定义数据。</param>
-        /// <returns>创建的加载配置失败事件。</returns>
-        public static LoadConfigFailureEventArgs Create(string configAssetName, LoadType loadType, string errorMessage, object userData)
+        /// <returns>创建的加载数据表失败事件。</returns>
+        public static LoadConfigFailureEventArgs Create(string dataTableAssetName, LoadType loadType, string errorMessage, object userData)
         {
-            LoadConfigFailureEventArgs loadConfigFailureEventArgs = ReferencePool.Acquire<LoadConfigFailureEventArgs>();
-            loadConfigFailureEventArgs.ConfigAssetName = configAssetName;
-            loadConfigFailureEventArgs.LoadType = loadType;
-            loadConfigFailureEventArgs.ErrorMessage = errorMessage;
-            loadConfigFailureEventArgs.UserData = userData;
-            return loadConfigFailureEventArgs;
+            LoadConfigFailureEventArgs loadConfigTableFailureEventArgs = ReferencePool.Acquire<LoadConfigFailureEventArgs>();
+            loadConfigTableFailureEventArgs.ConfigTableAssetName = dataTableAssetName;
+            loadConfigTableFailureEventArgs.LoadType = loadType;
+            loadConfigTableFailureEventArgs.ErrorMessage = errorMessage;
+            loadConfigTableFailureEventArgs.UserData = userData;
+            return loadConfigTableFailureEventArgs;
         }
 
         /// <summary>
-        /// 清理加载配置失败事件。
+        /// 清理加载数据表失败事件。
         /// </summary>
         public override void Clear()
         {
-            ConfigAssetName = null;
+            ConfigTableAssetName = null;
             LoadType = LoadType.Text;
             ErrorMessage = null;
             UserData = null;

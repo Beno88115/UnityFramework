@@ -7,40 +7,41 @@
 
 using GameFramework.Resource;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace GameFramework.Config
 {
     /// <summary>
-    /// 配置管理器接口。
+    /// 数据表管理器接口。
     /// </summary>
     public interface IConfigModule
     {
         /// <summary>
-        /// 获取配置数量。
+        /// 获取数据表数量。
         /// </summary>
-        int ConfigCount
+        int Count
         {
             get;
         }
 
         /// <summary>
-        /// 加载配置成功事件。
+        /// 加载数据表成功事件。
         /// </summary>
         event EventHandler<LoadConfigSuccessEventArgs> LoadConfigSuccess;
 
         /// <summary>
-        /// 加载配置失败事件。
+        /// 加载数据表失败事件。
         /// </summary>
         event EventHandler<LoadConfigFailureEventArgs> LoadConfigFailure;
 
         /// <summary>
-        /// 加载配置更新事件。
+        /// 加载数据表更新事件。
         /// </summary>
         event EventHandler<LoadConfigUpdateEventArgs> LoadConfigUpdate;
 
         /// <summary>
-        /// 加载配置时加载依赖资源事件。
+        /// 加载数据表时加载依赖资源事件。
         /// </summary>
         event EventHandler<LoadConfigDependencyAssetEventArgs> LoadConfigDependencyAsset;
 
@@ -51,175 +52,245 @@ namespace GameFramework.Config
         void SetResourceModule(IResourceModule resourceModule);
 
         /// <summary>
-        /// 设置配置辅助器。
+        /// 设置数据表辅助器。
         /// </summary>
-        /// <param name="configHelper">配置辅助器。</param>
-        void SetConfigHelper(IConfigHelper configHelper);
+        /// <param name="configTableHelper">数据表辅助器。</param>
+        void SetConfigHelper(IConfigHelper configTableHelper);
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        void LoadConfig(string configAssetName, LoadType loadType);
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        void LoadConfigTable(string configTableAssetName, LoadType loadType);
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        /// <param name="priority">加载配置资源的优先级。</param>
-        void LoadConfig(string configAssetName, LoadType loadType, int priority);
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        /// <param name="priority">加载数据表资源的优先级。</param>
+        void LoadConfigTable(string configTableAssetName, LoadType loadType, int priority);
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
         /// <param name="userData">用户自定义数据。</param>
-        void LoadConfig(string configAssetName, LoadType loadType, object userData);
+        void LoadConfigTable(string configTableAssetName, LoadType loadType, object userData);
 
         /// <summary>
-        /// 加载配置。
+        /// 加载数据表。
         /// </summary>
-        /// <param name="configAssetName">配置资源名称。</param>
-        /// <param name="loadType">配置加载方式。</param>
-        /// <param name="priority">加载配置资源的优先级。</param>
+        /// <param name="configTableAssetName">数据表资源名称。</param>
+        /// <param name="loadType">数据表加载方式。</param>
+        /// <param name="priority">加载数据表资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        void LoadConfig(string configAssetName, LoadType loadType, int priority, object userData);
+        void LoadConfigTable(string configTableAssetName, LoadType loadType, int priority, object userData);
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="text">要解析的配置文本。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(string text);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <returns>是否存在数据表。</returns>
+        bool HasConfigTable<T>() where T : IConfigRow;
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="text">要解析的配置文本。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(string text, object userData);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <returns>是否存在数据表。</returns>
+        bool HasConfigTable(Type configRowType);
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="bytes">要解析的配置二进制流。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(byte[] bytes);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否存在数据表。</returns>
+        bool HasConfigTable<T>(string name) where T : IConfigRow;
 
         /// <summary>
-        /// 解析配置。
+        /// 是否存在数据表。
         /// </summary>
-        /// <param name="bytes">要解析的配置二进制流。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(byte[] bytes, object userData);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否存在数据表。</returns>
+        bool HasConfigTable(Type configRowType, string name);
 
         /// <summary>
-        /// 解析配置。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="stream">要解析的配置二进制流。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(Stream stream);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <returns>要获取的数据表。</returns>
+        IConfigTable<T> GetConfigTable<T>() where T : IConfigRow;
 
         /// <summary>
-        /// 解析配置。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="stream">要解析的配置二进制流。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>是否解析配置成功。</returns>
-        bool ParseConfig(Stream stream, object userData);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <returns>要获取的数据表。</returns>
+        ConfigTableBase GetConfigTable(Type configRowType);
 
         /// <summary>
-        /// 检查是否存在指定配置项。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="configName">要检查配置项的名称。</param>
-        /// <returns>指定的配置项是否存在。</returns>
-        bool HasConfig(string configName);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>要获取的数据表。</returns>
+        IConfigTable<T> GetConfigTable<T>(string name) where T : IConfigRow;
 
         /// <summary>
-        /// 增加指定配置项。
+        /// 获取数据表。
         /// </summary>
-        /// <param name="configName">要增加配置项的名称。</param>
-        /// <param name="boolValue">配置项布尔值。</param>
-        /// <param name="intValue">配置项整数值。</param>
-        /// <param name="floatValue">配置项浮点数值。</param>
-        /// <param name="stringValue">配置项字符串值。</param>
-        /// <returns>是否增加配置项成功。</returns>
-        bool AddConfig(string configName, bool boolValue, int intValue, float floatValue, string stringValue);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>要获取的数据表。</returns>
+        ConfigTableBase GetConfigTable(Type configRowType, string name);
 
         /// <summary>
-        /// 移除指定配置项。
+        /// 获取所有数据表。
         /// </summary>
-        /// <param name="configName">要移除配置项的名称。</param>
-        void RemoveConfig(string configName);
+        /// <returns>所有数据表。</returns>
+        ConfigTableBase[] GetAllConfigTables();
 
         /// <summary>
-        /// 清空所有配置项。
+        /// 获取所有数据表。
         /// </summary>
-        void RemoveAllConfigs();
+        /// <param name="results">所有数据表。</param>
+        void GetAllConfigTables(List<ConfigTableBase> results);
 
         /// <summary>
-        /// 从指定配置项中读取布尔值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的布尔值。</returns>
-        bool GetBool(string configName);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(string text) where T : class, IConfigRow, new();
 
         /// <summary>
-        /// 从指定配置项中读取布尔值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的布尔值。</returns>
-        bool GetBool(string configName, bool defaultValue);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, string text);
 
         /// <summary>
-        /// 从指定配置项中读取整数值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的整数值。</returns>
-        int GetInt(string configName);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(string name, string text) where T : class, IConfigRow, new();
 
         /// <summary>
-        /// 从指定配置项中读取整数值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的整数值。</returns>
-        int GetInt(string configName, int defaultValue);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="text">要解析的数据表文本。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, string name, string text);
 
         /// <summary>
-        /// 从指定配置项中读取浮点数值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的浮点数值。</returns>
-        float GetFloat(string configName);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(byte[] bytes) where T : class, IConfigRow, new();
 
         /// <summary>
-        /// 从指定配置项中读取浮点数值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的浮点数值。</returns>
-        float GetFloat(string configName, float defaultValue);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, byte[] bytes);
 
         /// <summary>
-        /// 从指定配置项中读取字符串值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <returns>读取的字符串值。</returns>
-        string GetString(string configName);
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(string name, byte[] bytes) where T : class, IConfigRow, new();
 
         /// <summary>
-        /// 从指定配置项中读取字符串值。
+        /// 创建数据表。
         /// </summary>
-        /// <param name="configName">要获取配置项的名称。</param>
-        /// <param name="defaultValue">当指定的配置项不存在时，返回此默认值。</param>
-        /// <returns>读取的字符串值。</returns>
-        string GetString(string configName, string defaultValue);
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="bytes">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, string name, byte[] bytes);
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(Stream stream) where T : class, IConfigRow, new();
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, Stream stream);
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        IConfigTable<T> CreateConfigTable<T>(string name, Stream stream) where T : class, IConfigRow, new();
+
+        /// <summary>
+        /// 创建数据表。
+        /// </summary>
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <param name="stream">要解析的数据表二进制流。</param>
+        /// <returns>要创建的数据表。</returns>
+        ConfigTableBase CreateConfigTable(Type configRowType, string name, Stream stream);
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <returns>是否销毁数据表成功。</returns>
+        bool DestroyConfigTable<T>() where T : IConfigRow;
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <returns>是否销毁数据表成功。</returns>
+        bool DestroyConfigTable(Type configRowType);
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <typeparam name="T">数据表行的类型。</typeparam>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否销毁数据表成功。</returns>
+        bool DestroyConfigTable<T>(string name) where T : IConfigRow;
+
+        /// <summary>
+        /// 销毁数据表。
+        /// </summary>
+        /// <param name="configRowType">数据表行的类型。</param>
+        /// <param name="name">数据表名称。</param>
+        /// <returns>是否销毁数据表成功。</returns>
+        bool DestroyConfigTable(Type configRowType, string name);
     }
 }
