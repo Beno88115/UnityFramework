@@ -7,7 +7,7 @@ public class Test : MonoBehaviour
     void Start()
     {
         AppFacade.Instance.Initialize();
-        UIManager.Instance.PushForm("UILogin");
+        UIManager.Instance.PushWindow("UILogin");
 
         //  UnityEditor.AssetDatabase.GetAllAssetPaths();
         // UnityEditor.AssetDatabase.GetAllAssetBundleNames();
@@ -19,9 +19,10 @@ public class Test : MonoBehaviour
         //     var assetPaths = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleNames[i]);
         //     if (assetPaths != null) 
         //     {
-        //         // for (int j = 0; j < assetPaths.Length; ++j)
+        //         for (int j = 0; j < assetPaths.Length; ++j)
         //         {
-        //             Debug.Log(", variant:" + UnityEditor.AssetDatabase.GetImplicitAssetBundleVariantName(assetBundleNames[i]));                    
+        //             Debug.Log("========" + assetPaths[j]);
+        //             // Debug.Log(", variant:" + UnityEditor.AssetDatabase.GetImplicitAssetBundleVariantName(assetBundleNames[i]));                    
         //         }
         //     }
         // }

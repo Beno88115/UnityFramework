@@ -33,7 +33,7 @@ public class UIWindowHelper : IUIWindowHelper
     {
         var ui = uiWindowInstance as GameObject;
         var window = ui.GetComponent<UIWindow>(); 
-        window.transform.SetParent(m_Groups[Utility.Enum.GetString(UIGroupType.UIWindow)].transform, false);
+        window.transform.SetParent(m_Groups[uiGroup.Name].transform, false);
         return window;
     }
 

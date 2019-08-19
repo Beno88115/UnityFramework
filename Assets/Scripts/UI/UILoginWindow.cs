@@ -17,6 +17,6 @@ public class UILoginWindow : UIWindow
 
     private void OnLoginButtonClicked()
     {
-
+        UIManager.Instance.PushWindow("UIHome");
     }
 }

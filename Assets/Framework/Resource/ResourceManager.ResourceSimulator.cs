@@ -38,22 +38,23 @@ namespace GameFramework.Resource
                     m_ResourceManager.m_ResourceInfos = new Dictionary<ResourceName, ResourceInfo>(); 
                     for (int i = 0; i < assetBundleNames.Length; ++i)
                     {
-                        var assetPaths = m_ResourceManager.m_ResourceSimulationHelper.GetAssetPaths(assetBundleNames[i]);
+                        string assetBundleName = assetBundleNames[i];
+                        string[] assetPaths = m_ResourceManager.m_ResourceSimulationHelper.GetAssetPaths(assetBundleName);
                         if (assetPaths.Length != 0)
                         {
-                            string name = assetBundleNames[i];
                             string variant = m_ResourceManager.m_ResourceSimulationHelper.GetVariantFromAssetName(assetPaths[0]);
-                            ResourceName resourceName = new ResourceName(name, variant);
+                            ResourceName resourceName = new ResourceName(assetBundleName, variant);
 
                             for (int j = 0; j < assetPaths.Length; ++j)
                             {
                                 if (string.IsNullOrEmpty(variant) || variant == m_CurrentVariant)
                                 {
-                                    string assetName = assetPaths[j].Substring(assetPaths[j].LastIndexOf("/") + 1).Split('.')[0];
+                                    string assetPath = assetPaths[j];
+                                    string assetName = assetPath.Substring(assetPath.LastIndexOf("/") + 1).Split('.')[0];
                                     m_ResourceManager.m_AssetInfos.Add(assetName, new AssetInfo(assetName, resourceName, null));
                                 }
-                                ProcessResourceInfo(resourceName, 0, 0, 0);
                             }
+                            ProcessResourceInfo(resourceName, 0, 0, 0);
                         }
                     }
                 }

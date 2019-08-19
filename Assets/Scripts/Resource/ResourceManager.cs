@@ -53,4 +53,9 @@ public class ResourceManager : SingletonMono<ResourceManager>
     private void OnResourceUpdateFailure(object sender, GameFramework.Resource.ResourceUpdateFailureEventArgs e)
     {
     }
+
+    protected override bool IsGlobalScope 
+    { 
+        get { return true; } 
+    }
 }

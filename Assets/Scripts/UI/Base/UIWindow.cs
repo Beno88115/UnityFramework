@@ -68,6 +68,11 @@ public class UIWindow : MonoBehaviour, IUIWindow
     /// <param name="userData">用户自定义数据。</param>
     public virtual void OnInit(int serialId, string uiWindowAssetName, IUIGroup uiGroup, bool pauseCoveredUIWindow, bool isNewInstance, object userData)
     {
+        this.SerialId = serialId;
+        this.UIGroup = uiGroup;
+        this.PauseCoveredUIWindow = pauseCoveredUIWindow;
+        this.UIWindowAssetName = uiWindowAssetName;
+        this.Handle = this.gameObject;
     }
 
     /// <summary>
@@ -98,6 +103,8 @@ public class UIWindow : MonoBehaviour, IUIWindow
     /// </summary>
     public virtual void OnPause()
     {
+        if (this != null)
+            ((RectTransform)transform).anchoredPosition = new Vector2(0, 5000);
     }
 
     /// <summary>
@@ -105,6 +112,8 @@ public class UIWindow : MonoBehaviour, IUIWindow
     /// </summary>
     public virtual void OnResume()
     {
+        if (this != null)
+            ((RectTransform)transform).anchoredPosition = Vector2.zero;
     }
 
     /// <summary>
@@ -145,5 +154,6 @@ public class UIWindow : MonoBehaviour, IUIWindow
     /// <param name="depthInUIGroup">界面在界面组中的深度。</param>
     public virtual void OnDepthChanged(int uiGroupDepth, int depthInUIGroup)
     {
+        this.DepthInUIGroup = depthInUIGroup;
     }
 }

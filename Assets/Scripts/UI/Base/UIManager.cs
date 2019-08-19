@@ -16,33 +16,31 @@ public class UIManager : SingletonMono<UIManager>
     {
         base.Awake();
         InitCanvas();
+    }
 
+    public void Initialize()
+    {
         this.m_UIModule = GameFrameworkEntry.GetModule<GameFramework.UI.IUIManager>();
         this.m_UIModule.SetUIWindowHelper(new UIWindowHelper(m_Groups));
         this.m_UIModule.SetResourceManager(GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceManager>());
         this.m_UIModule.SetObjectPoolManager(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>());
 
-        this.m_UIModule.OpenUIWindowSuccess += this.OnOpenFormSuccess;
-        this.m_UIModule.OpenUIWindowFailure += this.OnOpenFormFailure;
-        this.m_UIModule.OpenUIWindowUpdate += this.OnOpenFormUpdate;
-        this.m_UIModule.OpenUIWindowDependencyAsset += this.OnOpenFormDependencyAsset;
-        this.m_UIModule.CloseUIWindowComplete += this.OnCloseFormComplete;
+        this.m_UIModule.OpenUIWindowSuccess += this.OnOpenWindowSuccess;
+        this.m_UIModule.OpenUIWindowFailure += this.OnOpenWindowFailure;
+        this.m_UIModule.OpenUIWindowUpdate += this.OnOpenWindowUpdate;
+        this.m_UIModule.OpenUIWindowDependencyAsset += this.OnOpenWindowDependencyAsset;
+        this.m_UIModule.CloseUIWindowComplete += this.OnCloseWindowComplete;
 
         InitGroups();
     }
 
     private void OnDestroy()
     {
-        this.m_UIModule.OpenUIWindowSuccess -= this.OnOpenFormSuccess;
-        this.m_UIModule.OpenUIWindowFailure -= this.OnOpenFormFailure;
-        this.m_UIModule.OpenUIWindowUpdate -= this.OnOpenFormUpdate;
-        this.m_UIModule.OpenUIWindowDependencyAsset -= this.OnOpenFormDependencyAsset;
-        this.m_UIModule.CloseUIWindowComplete -= this.OnCloseFormComplete;
-    }
-
-    public void Initialize()
-    {
-        
+        this.m_UIModule.OpenUIWindowSuccess -= this.OnOpenWindowSuccess;
+        this.m_UIModule.OpenUIWindowFailure -= this.OnOpenWindowFailure;
+        this.m_UIModule.OpenUIWindowUpdate -= this.OnOpenWindowUpdate;
+        this.m_UIModule.OpenUIWindowDependencyAsset -= this.OnOpenWindowDependencyAsset;
+        this.m_UIModule.CloseUIWindowComplete -= this.OnCloseWindowComplete;
     }
 
     private void InitCanvas()
@@ -103,22 +101,22 @@ public class UIManager : SingletonMono<UIManager>
         return false;
     }
 
-    public int PushForm(string assetName)
+    public int PushWindow(string assetName)
     {
-        return PushForm(assetName, true, null);
+        return PushWindow(assetName, true, null);
     }
 
-    public int PushForm(string assetName, bool pauseCoveredUIWindow)
+    public int PushWindow(string assetName, bool pauseCoveredUIWindow)
     {
-        return PushForm(assetName, pauseCoveredUIWindow, null);
+        return PushWindow(assetName, pauseCoveredUIWindow, null);
     }
 
-    public int PushForm(string assetName, object userData)
+    public int PushWindow(string assetName, object userData)
     {
-        return PushForm(assetName, true, userData);
+        return PushWindow(assetName, true, userData);
     }
 
-    public int PushForm(string assetName, bool pauseCoveredUIWindow, object userData)
+    public int PushWindow(string assetName, bool pauseCoveredUIWindow, object userData)
     {
         return Push(assetName, UIGroupType.UIWindow, pauseCoveredUIWindow, userData);
     }
@@ -148,27 +146,49 @@ public class UIManager : SingletonMono<UIManager>
         return m_UIModule.OpenUIWindow(assetName, Utility.Enum.GetString<UIGroupType>(groupType), pauseCoveredUIWindow, userData);
     }
 
-    private void OnOpenFormSuccess(object sender, GameFramework.UI.OpenUIWindowSuccessEventArgs e)
+    public void PopWindow(int serialId)
     {
-        Debug.Log("====================success");
+        m_UIModule.CloseUIWindow(serialId);
     }
 
-    private void OnOpenFormFailure(object sender, GameFramework.UI.OpenUIWindowFailureEventArgs e)
+    public void PopWindow(int serialId, object userData)
     {
-        Debug.Log("====================failure");
+        m_UIModule.CloseUIWindow(serialId, userData);
     }
 
-    private void OnOpenFormUpdate(object sender, GameFramework.UI.OpenUIWindowUpdateEventArgs e)
+    public void PopDialog(int serialId)
     {
+        this.PopWindow(serialId);
     }
 
-    private void OnOpenFormDependencyAsset(object sender, GameFramework.UI.OpenUIWindowDependencyAssetEventArgs e)
+    public void PopDialog(int serialId, object userData)
     {
+        this.PopWindow(serialId, userData);
     }
 
-    private void OnCloseFormComplete(object sender, GameFramework.UI.CloseUIWindowCompleteEventArgs e)
+    private void OnOpenWindowSuccess(object sender, GameFramework.UI.OpenUIWindowSuccessEventArgs e)
     {
-        Debug.Log("====================close");
+        Debug.LogFormat("OnOpenWindowSuccess[{0}]", e.UIWindow.UIWindowAssetName);
+    }
+
+    private void OnOpenWindowFailure(object sender, GameFramework.UI.OpenUIWindowFailureEventArgs e)
+    {
+        Debug.LogFormat("OnOpenWindowFailure[{0}]", e.UIWindowAssetName);
+    }
+
+    private void OnOpenWindowUpdate(object sender, GameFramework.UI.OpenUIWindowUpdateEventArgs e)
+    {
+        Debug.LogFormat("OnOpenWindowUpdate[{0}]", e.UIWindowAssetName);
+    }
+
+    private void OnOpenWindowDependencyAsset(object sender, GameFramework.UI.OpenUIWindowDependencyAssetEventArgs e)
+    {
+        Debug.LogFormat("OnOpenWindowDependencyAsset[{0}]", e.DependencyAssetName);
+    }
+
+    private void OnCloseWindowComplete(object sender, GameFramework.UI.CloseUIWindowCompleteEventArgs e)
+    {
+        Debug.LogFormat("OnCloseWindowComplete[{0}]", e.UIWindowAssetName);
     }
 
     protected override bool IsGlobalScope

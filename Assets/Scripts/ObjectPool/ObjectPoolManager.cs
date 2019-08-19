@@ -11,4 +11,9 @@ public class ObjectPoolManager : SingletonMono<ObjectPoolManager>
     {
         this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>();
     }
+
+    protected override bool IsGlobalScope 
+    { 
+        get { return true; } 
+    }
 }

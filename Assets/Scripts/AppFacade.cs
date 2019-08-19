@@ -7,13 +7,13 @@ public class AppFacade : SingletonMono<AppFacade>
     {
         base.Awake();
 
+        Debug.unityLogger.logEnabled = AppConst.kLogEnabled;
+        if (AppConst.kLogMessageReceived)
+            Application.logMessageReceived += OnLogMessage;
+
 #if UNITY_5_6_OR_NEWER
         Application.lowMemory += OnLowMemory;
 #endif
-    }
-
-    private void Start()
-    {
     }
 
     public void Initialize()
@@ -32,13 +32,22 @@ public class AppFacade : SingletonMono<AppFacade>
 
     private void OnDestroy()
     {
+        if (AppConst.kLogMessageReceived) 
+            Application.logMessageReceived -= OnLogMessage;
+
 #if UNITY_5_6_OR_NEWER
         Application.lowMemory -= OnLowMemory;
 #endif
+
         GameFrameworkEntry.Shutdown();
     }
     
     private void OnLowMemory()
+    {
+        // TODO:
+    }
+
+    private void OnLogMessage(string condition, string stackTrace, LogType type)
     {
         // TODO:
     }
