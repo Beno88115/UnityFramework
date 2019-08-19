@@ -8,7 +8,7 @@ public class UIManager : SingletonMono<UIManager>
 {
     private static readonly string kCanvasName = "UICanvas";
 
-    private GameFramework.UI.IUIManager m_UIModule = null;
+    private GameFramework.UI.IUIModule m_UIModule = null;
     private Dictionary<string, UIGroup> m_Groups = new Dictionary<string, UIGroup>();
     private Canvas m_Canvas = null;
 
@@ -20,10 +20,10 @@ public class UIManager : SingletonMono<UIManager>
 
     public void Initialize()
     {
-        this.m_UIModule = GameFrameworkEntry.GetModule<GameFramework.UI.IUIManager>();
+        this.m_UIModule = GameFrameworkEntry.GetModule<GameFramework.UI.IUIModule>();
         this.m_UIModule.SetUIWindowHelper(new UIWindowHelper(m_Groups));
-        this.m_UIModule.SetResourceManager(GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceManager>());
-        this.m_UIModule.SetObjectPoolManager(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>());
+        this.m_UIModule.SetResourceModule(GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceModule>());
+        this.m_UIModule.SetObjectPoolModule(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolModule>());
 
         this.m_UIModule.OpenUIWindowSuccess += this.OnOpenWindowSuccess;
         this.m_UIModule.OpenUIWindowFailure += this.OnOpenWindowFailure;

@@ -7,16 +7,16 @@ public class ResourceManager : SingletonMono<ResourceManager>
 {
     private readonly static int RESOURCE_AGENT_COUNT = 3;
 
-    private GameFramework.Resource.IResourceManager m_ResModule;
+    private GameFramework.Resource.IResourceModule m_ResModule;
 
     public void Initialize()
     {
-        this.m_ResModule = GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceManager>();
+        this.m_ResModule = GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceModule>();
         this.m_ResModule.SetResourceHelper(new ResourceHelper());
         this.m_ResModule.SetResourceSimulationHelper(new ResourceSimulationHelper());
 
-        this.m_ResModule.SetDownloadManager(GameFrameworkEntry.GetModule<GameFramework.Download.IDownloadManager>());
-        this.m_ResModule.SetObjectPoolManager(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>());
+        this.m_ResModule.SetDownloadModule(GameFrameworkEntry.GetModule<GameFramework.Download.IDownloadModule>());
+        this.m_ResModule.SetObjectPoolModule(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolModule>());
 
         this.m_ResModule.SetReadOnlyPath(Application.streamingAssetsPath);
         this.m_ResModule.SetReadWritePath(Application.persistentDataPath);

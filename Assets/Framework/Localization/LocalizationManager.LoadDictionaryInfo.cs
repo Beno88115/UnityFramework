@@ -7,7 +7,7 @@
 
 namespace GameFramework.Localization
 {
-    internal sealed partial class LocalizationManager : GameFrameworkModule, ILocalizationManager
+    internal sealed partial class LocalizationModule : GameFrameworkModule, ILocalizationModule
     {
         private sealed class LoadDictionaryInfo : IReference
         {

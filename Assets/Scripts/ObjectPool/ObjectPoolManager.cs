@@ -5,11 +5,11 @@ using GameFramework;
 
 public class ObjectPoolManager : SingletonMono<ObjectPoolManager> 
 {
-    private GameFramework.ObjectPool.IObjectPoolManager m_ObjectPoolModule;
+    private GameFramework.ObjectPool.IObjectPoolModule m_ObjectPoolModule;
 
     public void Initialize()
     {
-        this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolManager>();
+        this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolModule>();
     }
 
     protected override bool IsGlobalScope 

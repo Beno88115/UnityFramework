@@ -6,14 +6,14 @@
 //------------------------------------------------------------
 
 using GameFramework.Fsm;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
+using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureModule>;
 
 namespace GameFramework.Procedure
 {
     /// <summary>
     /// 流程基类。
     /// </summary>
-    public abstract class ProcedureBase : FsmState<IProcedureManager>
+    public abstract class ProcedureBase : FsmState<IProcedureModule>
     {
         /// <summary>
         /// 状态初始化时调用。
