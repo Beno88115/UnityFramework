@@ -7,12 +7,12 @@
 
 using System.IO;
 
-namespace GameFramework.DataTable
+namespace GameFramework.Config
 {
     /// <summary>
     /// 数据表行接口。
     /// </summary>
-    public interface IDataRow
+    public interface IConfigRow
     {
         /// <summary>
         /// 获取数据表行的编号。
@@ -27,20 +27,20 @@ namespace GameFramework.DataTable
         /// </summary>
         /// <param name="dataRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否解析数据表行成功。</returns>
-        bool ParseDataRow(GameFrameworkSegment<string> dataRowSegment);
+        bool ParseConfigRow(GameFrameworkSegment<string> dataRowSegment);
 
         /// <summary>
         /// 数据表行二进制流解析器。
         /// </summary>
         /// <param name="dataRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否解析数据表行成功。</returns>
-        bool ParseDataRow(GameFrameworkSegment<byte[]> dataRowSegment);
+        bool ParseConfigRow(GameFrameworkSegment<byte[]> dataRowSegment);
 
         /// <summary>
         /// 数据表行二进制流解析器。
         /// </summary>
         /// <param name="dataRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否解析数据表行成功。</returns>
-        bool ParseDataRow(GameFrameworkSegment<Stream> dataRowSegment);
+        bool ParseConfigRow(GameFrameworkSegment<Stream> dataRowSegment);
     }
 }

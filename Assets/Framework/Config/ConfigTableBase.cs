@@ -8,19 +8,19 @@
 using System;
 using System.IO;
 
-namespace GameFramework.DataTable
+namespace GameFramework.Config
 {
     /// <summary>
     /// 数据表基类。
     /// </summary>
-    public abstract class DataTableBase
+    public abstract class ConfigTableBase
     {
         private readonly string m_Name;
 
         /// <summary>
         /// 初始化数据表基类的新实例。
         /// </summary>
-        public DataTableBase()
+        public ConfigTableBase()
             : this(null)
         {
         }
@@ -29,7 +29,7 @@ namespace GameFramework.DataTable
         /// 初始化数据表基类的新实例。
         /// </summary>
         /// <param name="name">数据表名称。</param>
-        public DataTableBase(string name)
+        public ConfigTableBase(string name)
         {
             m_Name = name ?? string.Empty;
         }
@@ -64,23 +64,23 @@ namespace GameFramework.DataTable
         /// <summary>
         /// 增加数据表行。
         /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+        /// <param name="configRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddDataRow(GameFrameworkSegment<string> dataRowSegment);
+        internal abstract bool AddConfigRow(GameFrameworkSegment<string> configRowSegment);
 
         /// <summary>
         /// 增加数据表行。
         /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+        /// <param name="configRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddDataRow(GameFrameworkSegment<byte[]> dataRowSegment);
+        internal abstract bool AddConfigRow(GameFrameworkSegment<byte[]> configRowSegment);
 
         /// <summary>
         /// 增加数据表行。
         /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+        /// <param name="configRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddDataRow(GameFrameworkSegment<Stream> dataRowSegment);
+        internal abstract bool AddConfigRow(GameFrameworkSegment<Stream> configRowSegment);
 
         /// <summary>
         /// 关闭并清理数据表。

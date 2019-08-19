@@ -10,30 +10,30 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-namespace GameFramework.DataTable
+namespace GameFramework.Config
 {
-    internal sealed partial class DataTableModule : GameFrameworkModule, IDataTableModule
+    internal sealed partial class ConfigModule : GameFrameworkModule, IConfigModule
     {
         /// <summary>
         /// 数据表。
         /// </summary>
         /// <typeparam name="T">数据表行的类型。</typeparam>
-        private sealed class DataTable<T> : DataTableBase, IDataTable<T> where T : class, IDataRow, new()
+        private sealed class ConfigTable<T> : ConfigTableBase, IConfigTable<T> where T : class, IConfigRow, new()
         {
-            private readonly Dictionary<int, T> m_DataSet;
-            private T m_MinIdDataRow;
-            private T m_MaxIdDataRow;
+            private readonly Dictionary<int, T> m_ConfigSet;
+            private T m_MinIdConfigRow;
+            private T m_MaxIdConfigRow;
 
             /// <summary>
             /// 初始化数据表的新实例。
             /// </summary>
             /// <param name="name">数据表名称。</param>
-            public DataTable(string name)
+            public ConfigTable(string name)
                 : base(name)
             {
-                m_DataSet = new Dictionary<int, T>();
-                m_MinIdDataRow = null;
-                m_MaxIdDataRow = null;
+                m_ConfigSet = new Dictionary<int, T>();
+                m_MinIdConfigRow = null;
+                m_MaxIdConfigRow = null;
             }
 
             /// <summary>
@@ -54,7 +54,7 @@ namespace GameFramework.DataTable
             {
                 get
                 {
-                    return m_DataSet.Count;
+                    return m_ConfigSet.Count;
                 }
             }
 
@@ -67,29 +67,29 @@ namespace GameFramework.DataTable
             {
                 get
                 {
-                    return GetDataRow(id);
+                    return GetConfigRow(id);
                 }
             }
 
             /// <summary>
             /// 获取编号最小的数据表行。
             /// </summary>
-            public T MinIdDataRow
+            public T MinIdConfigRow
             {
                 get
                 {
-                    return m_MinIdDataRow;
+                    return m_MinIdConfigRow;
                 }
             }
 
             /// <summary>
             /// 获取编号最大的数据表行。
             /// </summary>
-            public T MaxIdDataRow
+            public T MaxIdConfigRow
             {
                 get
                 {
-                    return m_MaxIdDataRow;
+                    return m_MaxIdConfigRow;
                 }
             }
 
@@ -98,9 +98,9 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="id">数据表行的编号。</param>
             /// <returns>是否存在数据表行。</returns>
-            public bool HasDataRow(int id)
+            public bool HasConfigRow(int id)
             {
-                return m_DataSet.ContainsKey(id);
+                return m_ConfigSet.ContainsKey(id);
             }
 
             /// <summary>
@@ -108,16 +108,16 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="condition">要检查的条件。</param>
             /// <returns>是否存在数据表行。</returns>
-            public bool HasDataRow(Predicate<T> condition)
+            public bool HasConfigRow(Predicate<T> condition)
             {
                 if (condition == null)
                 {
                     throw new GameFrameworkException("Condition is invalid.");
                 }
 
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
                         return true;
                     }
@@ -131,12 +131,12 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="id">数据表行的编号。</param>
             /// <returns>数据表行。</returns>
-            public T GetDataRow(int id)
+            public T GetConfigRow(int id)
             {
-                T dataRow = null;
-                if (m_DataSet.TryGetValue(id, out dataRow))
+                T configRow = null;
+                if (m_ConfigSet.TryGetValue(id, out configRow))
                 {
-                    return dataRow;
+                    return configRow;
                 }
 
                 return null;
@@ -148,18 +148,18 @@ namespace GameFramework.DataTable
             /// <param name="condition">要检查的条件。</param>
             /// <returns>符合条件的数据表行。</returns>
             /// <remarks>当存在多个符合条件的数据表行时，仅返回第一个符合条件的数据表行。</remarks>
-            public T GetDataRow(Predicate<T> condition)
+            public T GetConfigRow(Predicate<T> condition)
             {
                 if (condition == null)
                 {
                     throw new GameFrameworkException("Condition is invalid.");
                 }
 
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
-                        return dataRow.Value;
+                        return configRow.Value;
                     }
                 }
 
@@ -171,7 +171,7 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="condition">要检查的条件。</param>
             /// <returns>符合条件的数据表行。</returns>
-            public T[] GetDataRows(Predicate<T> condition)
+            public T[] GetConfigRows(Predicate<T> condition)
             {
                 if (condition == null)
                 {
@@ -179,11 +179,11 @@ namespace GameFramework.DataTable
                 }
 
                 List<T> results = new List<T>();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
-                        results.Add(dataRow.Value);
+                        results.Add(configRow.Value);
                     }
                 }
 
@@ -195,7 +195,7 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="condition">要检查的条件。</param>
             /// <param name="results">符合条件的数据表行。</param>
-            public void GetDataRows(Predicate<T> condition, List<T> results)
+            public void GetConfigRows(Predicate<T> condition, List<T> results)
             {
                 if (condition == null)
                 {
@@ -208,11 +208,11 @@ namespace GameFramework.DataTable
                 }
 
                 results.Clear();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
-                        results.Add(dataRow.Value);
+                        results.Add(configRow.Value);
                     }
                 }
             }
@@ -222,7 +222,7 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="comparison">要排序的条件。</param>
             /// <returns>排序后的数据表行。</returns>
-            public T[] GetDataRows(Comparison<T> comparison)
+            public T[] GetConfigRows(Comparison<T> comparison)
             {
                 if (comparison == null)
                 {
@@ -230,9 +230,9 @@ namespace GameFramework.DataTable
                 }
 
                 List<T> results = new List<T>();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    results.Add(dataRow.Value);
+                    results.Add(configRow.Value);
                 }
 
                 results.Sort(comparison);
@@ -244,7 +244,7 @@ namespace GameFramework.DataTable
             /// </summary>
             /// <param name="comparison">要排序的条件。</param>
             /// <param name="results">排序后的数据表行。</param>
-            public void GetDataRows(Comparison<T> comparison, List<T> results)
+            public void GetConfigRows(Comparison<T> comparison, List<T> results)
             {
                 if (comparison == null)
                 {
@@ -257,9 +257,9 @@ namespace GameFramework.DataTable
                 }
 
                 results.Clear();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    results.Add(dataRow.Value);
+                    results.Add(configRow.Value);
                 }
 
                 results.Sort(comparison);
@@ -271,7 +271,7 @@ namespace GameFramework.DataTable
             /// <param name="condition">要检查的条件。</param>
             /// <param name="comparison">要排序的条件。</param>
             /// <returns>排序后的符合条件的数据表行。</returns>
-            public T[] GetDataRows(Predicate<T> condition, Comparison<T> comparison)
+            public T[] GetConfigRows(Predicate<T> condition, Comparison<T> comparison)
             {
                 if (condition == null)
                 {
@@ -284,11 +284,11 @@ namespace GameFramework.DataTable
                 }
 
                 List<T> results = new List<T>();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
-                        results.Add(dataRow.Value);
+                        results.Add(configRow.Value);
                     }
                 }
 
@@ -302,7 +302,7 @@ namespace GameFramework.DataTable
             /// <param name="condition">要检查的条件。</param>
             /// <param name="comparison">要排序的条件。</param>
             /// <param name="results">排序后的符合条件的数据表行。</param>
-            public void GetDataRows(Predicate<T> condition, Comparison<T> comparison, List<T> results)
+            public void GetConfigRows(Predicate<T> condition, Comparison<T> comparison, List<T> results)
             {
                 if (condition == null)
                 {
@@ -320,11 +320,11 @@ namespace GameFramework.DataTable
                 }
 
                 results.Clear();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    if (condition(dataRow.Value))
+                    if (condition(configRow.Value))
                     {
-                        results.Add(dataRow.Value);
+                        results.Add(configRow.Value);
                     }
                 }
 
@@ -335,13 +335,13 @@ namespace GameFramework.DataTable
             /// 获取所有数据表行。
             /// </summary>
             /// <returns>所有数据表行。</returns>
-            public T[] GetAllDataRows()
+            public T[] GetAllConfigRows()
             {
                 int index = 0;
-                T[] results = new T[m_DataSet.Count];
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                T[] results = new T[m_ConfigSet.Count];
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    results[index++] = dataRow.Value;
+                    results[index++] = configRow.Value;
                 }
 
                 return results;
@@ -351,7 +351,7 @@ namespace GameFramework.DataTable
             /// 获取所有数据表行。
             /// </summary>
             /// <param name="results">所有数据表行。</param>
-            public void GetAllDataRows(List<T> results)
+            public void GetAllConfigRows(List<T> results)
             {
                 if (results == null)
                 {
@@ -359,9 +359,9 @@ namespace GameFramework.DataTable
                 }
 
                 results.Clear();
-                foreach (KeyValuePair<int, T> dataRow in m_DataSet)
+                foreach (KeyValuePair<int, T> configRow in m_ConfigSet)
                 {
-                    results.Add(dataRow.Value);
+                    results.Add(configRow.Value);
                 }
             }
 
@@ -371,12 +371,12 @@ namespace GameFramework.DataTable
             /// <returns>可用于循环访问数据表的对象。</returns>
             public IEnumerator<T> GetEnumerator()
             {
-                return m_DataSet.Values.GetEnumerator();
+                return m_ConfigSet.Values.GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return m_DataSet.Values.GetEnumerator();
+                return m_ConfigSet.Values.GetEnumerator();
             }
 
             /// <summary>
@@ -384,25 +384,25 @@ namespace GameFramework.DataTable
             /// </summary>
             internal override void Shutdown()
             {
-                m_DataSet.Clear();
+                m_ConfigSet.Clear();
             }
 
             /// <summary>
             /// 增加数据表行。
             /// </summary>
-            /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+            /// <param name="configRowSegment">要解析的数据表行片段。</param>
             /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddDataRow(GameFrameworkSegment<string> dataRowSegment)
+            internal override bool AddConfigRow(GameFrameworkSegment<string> configRowSegment)
             {
                 try
                 {
-                    T dataRow = new T();
-                    if (!dataRow.ParseDataRow(dataRowSegment))
+                    T configRow = new T();
+                    if (!configRow.ParseConfigRow(configRowSegment))
                     {
                         return false;
                     }
 
-                    InternalAddDataRow(dataRow);
+                    InternalAddConfigRow(configRow);
                     return true;
                 }
                 catch (Exception exception)
@@ -412,26 +412,26 @@ namespace GameFramework.DataTable
                         throw;
                     }
 
-                    throw new GameFrameworkException(Utility.Text.Format("Can not parse data table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
+                    throw new GameFrameworkException(Utility.Text.Format("Can not parse config table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
                 }
             }
 
             /// <summary>
             /// 增加数据表行。
             /// </summary>
-            /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+            /// <param name="configRowSegment">要解析的数据表行片段。</param>
             /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddDataRow(GameFrameworkSegment<byte[]> dataRowSegment)
+            internal override bool AddConfigRow(GameFrameworkSegment<byte[]> configRowSegment)
             {
                 try
                 {
-                    T dataRow = new T();
-                    if (!dataRow.ParseDataRow(dataRowSegment))
+                    T configRow = new T();
+                    if (!configRow.ParseConfigRow(configRowSegment))
                     {
                         return false;
                     }
 
-                    InternalAddDataRow(dataRow);
+                    InternalAddConfigRow(configRow);
                     return true;
                 }
                 catch (Exception exception)
@@ -441,26 +441,26 @@ namespace GameFramework.DataTable
                         throw;
                     }
 
-                    throw new GameFrameworkException(Utility.Text.Format("Can not parse data table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
+                    throw new GameFrameworkException(Utility.Text.Format("Can not parse config table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
                 }
             }
 
             /// <summary>
             /// 增加数据表行。
             /// </summary>
-            /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+            /// <param name="configRowSegment">要解析的数据表行片段。</param>
             /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddDataRow(GameFrameworkSegment<Stream> dataRowSegment)
+            internal override bool AddConfigRow(GameFrameworkSegment<Stream> configRowSegment)
             {
                 try
                 {
-                    T dataRow = new T();
-                    if (!dataRow.ParseDataRow(dataRowSegment))
+                    T configRow = new T();
+                    if (!configRow.ParseConfigRow(configRowSegment))
                     {
                         return false;
                     }
 
-                    InternalAddDataRow(dataRow);
+                    InternalAddConfigRow(configRow);
                     return true;
                 }
                 catch (Exception exception)
@@ -470,27 +470,27 @@ namespace GameFramework.DataTable
                         throw;
                     }
 
-                    throw new GameFrameworkException(Utility.Text.Format("Can not parse data table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
+                    throw new GameFrameworkException(Utility.Text.Format("Can not parse config table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
                 }
             }
 
-            private void InternalAddDataRow(T dataRow)
+            private void InternalAddConfigRow(T configRow)
             {
-                if (HasDataRow(dataRow.Id))
+                if (HasConfigRow(configRow.Id))
                 {
-                    throw new GameFrameworkException(Utility.Text.Format("Already exist '{0}' in data table '{1}'.", dataRow.Id.ToString(), Utility.Text.GetFullName<T>(Name)));
+                    throw new GameFrameworkException(Utility.Text.Format("Already exist '{0}' in config table '{1}'.", configRow.Id.ToString(), Utility.Text.GetFullName<T>(Name)));
                 }
 
-                m_DataSet.Add(dataRow.Id, dataRow);
+                m_ConfigSet.Add(configRow.Id, configRow);
 
-                if (m_MinIdDataRow == null || m_MinIdDataRow.Id > dataRow.Id)
+                if (m_MinIdConfigRow == null || m_MinIdConfigRow.Id > configRow.Id)
                 {
-                    m_MinIdDataRow = dataRow;
+                    m_MinIdConfigRow = configRow;
                 }
 
-                if (m_MaxIdDataRow == null || m_MaxIdDataRow.Id < dataRow.Id)
+                if (m_MaxIdConfigRow == null || m_MaxIdConfigRow.Id < configRow.Id)
                 {
-                    m_MaxIdDataRow = dataRow;
+                    m_MaxIdConfigRow = configRow;
                 }
             }
         }
