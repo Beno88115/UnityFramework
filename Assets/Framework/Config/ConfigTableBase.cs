@@ -66,21 +66,7 @@ namespace GameFramework.Config
         /// </summary>
         /// <param name="configRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddConfigRow(GameFrameworkSegment<string> configRowSegment);
-
-        /// <summary>
-        /// 增加数据表行。
-        /// </summary>
-        /// <param name="configRowSegment">要解析的数据表行片段。</param>
-        /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddConfigRow(GameFrameworkSegment<byte[]> configRowSegment);
-
-        /// <summary>
-        /// 增加数据表行。
-        /// </summary>
-        /// <param name="configRowSegment">要解析的数据表行片段。</param>
-        /// <returns>是否增加数据表行成功。</returns>
-        internal abstract bool AddConfigRow(GameFrameworkSegment<Stream> configRowSegment);
+        internal abstract bool AddConfigRow(object configRowSegment);
 
         /// <summary>
         /// 关闭并清理数据表。

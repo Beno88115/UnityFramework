@@ -5,8 +5,6 @@ using GameFramework;
 
 public class ResourceManager : SingletonMono<ResourceManager> 
 {
-    private readonly static int RESOURCE_AGENT_COUNT = 3;
-
     private GameFramework.Resource.IResourceModule m_ResModule;
 
     public void Initialize()
@@ -27,7 +25,7 @@ public class ResourceManager : SingletonMono<ResourceManager>
         this.m_ResModule.ResourceUpdateSuccess += OnResourceUpdateSuccess;
         this.m_ResModule.ResourceUpdateFailure += OnResourceUpdateFailure;
 
-        for (int i = 0; i < RESOURCE_AGENT_COUNT; ++i)
+        for (int i = 0; i < AppConst.kResourceAgentCount; ++i)
         {
             this.m_ResModule.AddLoadResourceAgentHelper(new LoadResourceAgentHelper());
         }

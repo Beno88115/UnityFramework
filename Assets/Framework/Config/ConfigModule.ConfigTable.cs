@@ -392,65 +392,7 @@ namespace GameFramework.Config
             /// </summary>
             /// <param name="configRowSegment">要解析的数据表行片段。</param>
             /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddConfigRow(GameFrameworkSegment<string> configRowSegment)
-            {
-                try
-                {
-                    T configRow = new T();
-                    if (!configRow.ParseConfigRow(configRowSegment))
-                    {
-                        return false;
-                    }
-
-                    InternalAddConfigRow(configRow);
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    if (exception is GameFrameworkException)
-                    {
-                        throw;
-                    }
-
-                    throw new GameFrameworkException(Utility.Text.Format("Can not parse config table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
-                }
-            }
-
-            /// <summary>
-            /// 增加数据表行。
-            /// </summary>
-            /// <param name="configRowSegment">要解析的数据表行片段。</param>
-            /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddConfigRow(GameFrameworkSegment<byte[]> configRowSegment)
-            {
-                try
-                {
-                    T configRow = new T();
-                    if (!configRow.ParseConfigRow(configRowSegment))
-                    {
-                        return false;
-                    }
-
-                    InternalAddConfigRow(configRow);
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    if (exception is GameFrameworkException)
-                    {
-                        throw;
-                    }
-
-                    throw new GameFrameworkException(Utility.Text.Format("Can not parse config table '{0}' with exception '{1}'.", Utility.Text.GetFullName<T>(Name), exception.ToString()), exception);
-                }
-            }
-
-            /// <summary>
-            /// 增加数据表行。
-            /// </summary>
-            /// <param name="configRowSegment">要解析的数据表行片段。</param>
-            /// <returns>是否增加数据表行成功。</returns>
-            internal override bool AddConfigRow(GameFrameworkSegment<Stream> configRowSegment)
+            internal override bool AddConfigRow(object configRowSegment)
             {
                 try
                 {

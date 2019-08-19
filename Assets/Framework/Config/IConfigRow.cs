@@ -25,22 +25,8 @@ namespace GameFramework.Config
         /// <summary>
         /// 数据表行文本解析器。
         /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
+        /// <param name="configRowSegment">要解析的数据表行片段。</param>
         /// <returns>是否解析数据表行成功。</returns>
-        bool ParseConfigRow(GameFrameworkSegment<string> dataRowSegment);
-
-        /// <summary>
-        /// 数据表行二进制流解析器。
-        /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
-        /// <returns>是否解析数据表行成功。</returns>
-        bool ParseConfigRow(GameFrameworkSegment<byte[]> dataRowSegment);
-
-        /// <summary>
-        /// 数据表行二进制流解析器。
-        /// </summary>
-        /// <param name="dataRowSegment">要解析的数据表行片段。</param>
-        /// <returns>是否解析数据表行成功。</returns>
-        bool ParseConfigRow(GameFrameworkSegment<Stream> dataRowSegment);
+        bool ParseConfigRow(object configRowSegment);
     }
 }

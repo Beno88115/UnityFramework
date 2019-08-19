@@ -210,7 +210,7 @@ namespace GameFramework.Config
 
             if (m_ConfigHelper == null)
             {
-                throw new GameFrameworkException("You must set data table helper first.");
+                throw new GameFrameworkException("You must set config table helper first.");
             }
 
             m_ResourceModule.LoadAsset(configTableAssetName, priority, m_LoadAssetCallbacks, LoadConfigTableInfo.Create(loadType, userData));
@@ -407,7 +407,7 @@ namespace GameFramework.Config
         {
             if (HasConfigTable<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName<T>(name)));
             }
 
             ConfigTable<T> configTable = new ConfigTable<T>(name);
@@ -419,31 +419,31 @@ namespace GameFramework.Config
         /// <summary>
         /// 创建数据表。
         /// </summary>
-        /// <param name="dataRowType">数据表行的类型。</param>
+        /// <param name="configRowType">数据表行的类型。</param>
         /// <param name="name">数据表名称。</param>
         /// <param name="text">要解析的数据表文本。</param>
         /// <returns>要创建的数据表。</returns>
-        public ConfigTableBase CreateConfigTable(Type dataRowType, string name, string text)
+        public ConfigTableBase CreateConfigTable(Type configRowType, string name, string text)
         {
-            if (dataRowType == null)
+            if (configRowType == null)
             {
                 throw new GameFrameworkException("Data row type is invalid.");
             }
 
-            if (!typeof(IConfigRow).IsAssignableFrom(dataRowType))
+            if (!typeof(IConfigRow).IsAssignableFrom(configRowType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", dataRowType.FullName));
+                throw new GameFrameworkException(Utility.Text.Format("Data row type '{0}' is invalid.", configRowType.FullName));
             }
 
-            if (HasConfigTable(dataRowType, name))
+            if (HasConfigTable(configRowType, name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName(configRowType, name)));
             }
 
-            Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
+            Type configTableType = typeof(ConfigTable<>).MakeGenericType(configRowType);
             ConfigTableBase configTable = (ConfigTableBase)Activator.CreateInstance(configTableType, name);
             InternalCreateConfigTable(configTable, text);
-            m_ConfigTables.Add(Utility.Text.GetFullName(dataRowType, name), configTable);
+            m_ConfigTables.Add(Utility.Text.GetFullName(configRowType, name), configTable);
             return configTable;
         }
 
@@ -480,7 +480,7 @@ namespace GameFramework.Config
         {
             if (HasConfigTable<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName<T>(name)));
             }
 
             ConfigTable<T> configTable = new ConfigTable<T>(name);
@@ -510,7 +510,7 @@ namespace GameFramework.Config
 
             if (HasConfigTable(dataRowType, name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
             }
 
             Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
@@ -553,7 +553,7 @@ namespace GameFramework.Config
         {
             if (HasConfigTable<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName<T>(name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName<T>(name)));
             }
 
             ConfigTable<T> configTable = new ConfigTable<T>(name);
@@ -583,7 +583,7 @@ namespace GameFramework.Config
 
             if (HasConfigTable(dataRowType, name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist data table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist config table '{0}'.", Utility.Text.GetFullName(dataRowType, name)));
             }
 
             Type configTableType = typeof(ConfigTable<>).MakeGenericType(dataRowType);
@@ -671,7 +671,7 @@ namespace GameFramework.Config
 
         private void InternalCreateConfigTable(ConfigTableBase configTable, string text)
         {
-            IEnumerable<GameFrameworkSegment<string>> dataRowSegments = null;
+            IEnumerable<object> dataRowSegments = null;
             try
             {
                 dataRowSegments = m_ConfigHelper.GetDataRowSegments(text);
@@ -683,7 +683,7 @@ namespace GameFramework.Config
                     throw;
                 }
 
-                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+                throw new GameFrameworkException(Utility.Text.Format("Can not get config row segments with exception '{0}'.", exception.ToString()), exception);
             }
 
             if (dataRowSegments == null)
@@ -691,18 +691,18 @@ namespace GameFramework.Config
                 throw new GameFrameworkException("Data row segments is invalid.");
             }
 
-            foreach (GameFrameworkSegment<string> dataRowSegment in dataRowSegments)
+            foreach (object dataRowSegment in dataRowSegments)
             {
                 if (!configTable.AddConfigRow(dataRowSegment))
                 {
-                    throw new GameFrameworkException("Add data row failure.");
+                    throw new GameFrameworkException("Add config row failure.");
                 }
             }
         }
 
         private void InternalCreateConfigTable(ConfigTableBase configTable, byte[] bytes)
         {
-            IEnumerable<GameFrameworkSegment<byte[]>> dataRowSegments = null;
+            IEnumerable<object> dataRowSegments = null;
             try
             {
                 dataRowSegments = m_ConfigHelper.GetDataRowSegments(bytes);
@@ -714,7 +714,7 @@ namespace GameFramework.Config
                     throw;
                 }
 
-                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+                throw new GameFrameworkException(Utility.Text.Format("Can not get config row segments with exception '{0}'.", exception.ToString()), exception);
             }
 
             if (dataRowSegments == null)
@@ -722,18 +722,18 @@ namespace GameFramework.Config
                 throw new GameFrameworkException("Data row segments is invalid.");
             }
 
-            foreach (GameFrameworkSegment<byte[]> dataRowSegment in dataRowSegments)
+            foreach (object dataRowSegment in dataRowSegments)
             {
                 if (!configTable.AddConfigRow(dataRowSegment))
                 {
-                    throw new GameFrameworkException("Add data row failure.");
+                    throw new GameFrameworkException("Add config row failure.");
                 }
             }
         }
 
         private void InternalCreateConfigTable(ConfigTableBase configTable, Stream stream)
         {
-            IEnumerable<GameFrameworkSegment<Stream>> dataRowSegments = null;
+            IEnumerable<object> dataRowSegments = null;
             try
             {
                 dataRowSegments = m_ConfigHelper.GetDataRowSegments(stream);
@@ -745,7 +745,7 @@ namespace GameFramework.Config
                     throw;
                 }
 
-                throw new GameFrameworkException(Utility.Text.Format("Can not get data row segments with exception '{0}'.", exception.ToString()), exception);
+                throw new GameFrameworkException(Utility.Text.Format("Can not get config row segments with exception '{0}'.", exception.ToString()), exception);
             }
 
             if (dataRowSegments == null)
@@ -753,11 +753,11 @@ namespace GameFramework.Config
                 throw new GameFrameworkException("Data row segments is invalid.");
             }
 
-            foreach (GameFrameworkSegment<Stream> dataRowSegment in dataRowSegments)
+            foreach (object dataRowSegment in dataRowSegments)
             {
                 if (!configTable.AddConfigRow(dataRowSegment))
                 {
-                    throw new GameFrameworkException("Add data row failure.");
+                    throw new GameFrameworkException("Add config row failure.");
                 }
             }
         }
@@ -779,14 +779,14 @@ namespace GameFramework.Config
             LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
             if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load data table info is invalid.");
+                throw new GameFrameworkException("Load config table info is invalid.");
             }
 
             try
             {
                 if (!m_ConfigHelper.LoadConfigTable(configTableAsset, loadConfigTableInfo.LoadType, loadConfigTableInfo.UserData))
                 {
-                    throw new GameFrameworkException(Utility.Text.Format("Load data table failure in helper, asset name '{0}'.", configTableAssetName));
+                    throw new GameFrameworkException(Utility.Text.Format("Load config table failure in helper, asset name '{0}'.", configTableAssetName));
                 }
 
                 if (m_ConfigSuccessEventHandler != null)
@@ -820,10 +820,10 @@ namespace GameFramework.Config
             LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
             if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load data table info is invalid.");
+                throw new GameFrameworkException("Load config table info is invalid.");
             }
 
-            string appendErrorMessage = Utility.Text.Format("Load data table failure, asset name '{0}', status '{1}', error message '{2}'.", configTableAssetName, status.ToString(), errorMessage);
+            string appendErrorMessage = Utility.Text.Format("Load config table failure, asset name '{0}', status '{1}', error message '{2}'.", configTableAssetName, status.ToString(), errorMessage);
             if (m_ConfigFailureEventHandler != null)
             {
                 LoadConfigFailureEventArgs loadConfigTableFailureEventArgs = LoadConfigFailureEventArgs.Create(configTableAssetName, loadConfigTableInfo.LoadType, appendErrorMessage, loadConfigTableInfo.UserData);
@@ -842,7 +842,7 @@ namespace GameFramework.Config
             LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
             if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load data table info is invalid.");
+                throw new GameFrameworkException("Load config table info is invalid.");
             }
 
             if (m_ConfigUpdateEventHandler != null)
@@ -858,7 +858,7 @@ namespace GameFramework.Config
             LoadConfigTableInfo loadConfigTableInfo = (LoadConfigTableInfo)userData;
             if (loadConfigTableInfo == null)
             {
-                throw new GameFrameworkException("Load data table info is invalid.");
+                throw new GameFrameworkException("Load config table info is invalid.");
             }
 
             if (m_ConfigDependencyAssetEventHandler != null)

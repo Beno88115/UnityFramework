@@ -8,7 +8,7 @@ public class Test : MonoBehaviour
     {
         AppFacade.Instance.Initialize();
         UIManager.Instance.PushWindow("UILogin");
-        
+
         //  UnityEditor.AssetDatabase.GetAllAssetPaths();
         // UnityEditor.AssetDatabase.GetAllAssetBundleNames();
         // UnityEditor.AssetDatabase.getm
