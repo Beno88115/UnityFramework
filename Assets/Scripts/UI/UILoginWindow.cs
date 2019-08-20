@@ -25,6 +25,7 @@ public class UILoginWindow : UIWindow
     private void OnLogupButtonClicked()
     {
         ConfigManager.Instance.LoadConfigs(OnLoadConfigsProgressCallback, OnLoadConfigsSuccessCallback, OnLoadConfigsFailureCallback);
+        btnLogUp.interactable = false;
     }
 
     private void OnLoadConfigsProgressCallback(string configTableName)
@@ -40,5 +41,11 @@ public class UILoginWindow : UIWindow
     private void OnLoadConfigsSuccessCallback()
     {
         Debug.Log("==============load config success");
+        
+        var cfgRow = ConfigManager.Instance.GetConfigRow<ConfigPropRow>(101);
+        if (cfgRow != null)
+        {
+            Debug.LogFormat("id:{0}, limit:{1}, tex: {2}", cfgRow.Id, cfgRow.Limit, cfgRow.Tex);
+        }
     }
 }

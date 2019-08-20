@@ -33,7 +33,7 @@ public class ConfigHelper : IConfigHelper
         if (configRowType == null)
             return false;
 
-        m_ConfigModule.CreateConfigTable(configRowType, configTableName, textAsset.text);
+        m_ConfigModule.CreateConfigTable(configRowType, textAsset.text);
         return true;
     }
 
