@@ -9,12 +9,15 @@ public class UILoginWindow : UIWindow
     [SerializeField]
     Button btnLogIn;
     [SerializeField]
-    Button btnLogUp;
+    Button btnConfig;
+    [SerializeField]
+    Button btnLocalization;
 
     void Awake()
     {
         this.btnLogIn.onClick.AddListener(this.OnLoginButtonClicked);
-        this.btnLogUp.onClick.AddListener(this.OnLogupButtonClicked);
+        this.btnConfig.onClick.AddListener(this.OnConfigButtonClicked);
+        this.btnLocalization.onClick.AddListener(this.OnLocalizationButtonClicked);
     }
 
     private void OnLoginButtonClicked()
@@ -22,10 +25,15 @@ public class UILoginWindow : UIWindow
         UIManager.Instance.PushWindow("UIHome");
     }
 
-    private void OnLogupButtonClicked()
+    private void OnConfigButtonClicked()
     {
         ConfigManager.Instance.LoadConfigs(OnLoadConfigsProgressCallback, OnLoadConfigsSuccessCallback, OnLoadConfigsFailureCallback);
-        btnLogUp.interactable = false;
+        btnConfig.interactable = false;
+    }
+
+    private void OnLocalizationButtonClicked()
+    {
+        UIManager.Instance.PushWindow("UILocalization");
     }
 
     private void OnLoadConfigsProgressCallback(string configTableName)

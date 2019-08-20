@@ -1,2 +1,4 @@
 *.sln
 *.csproj
+Excel2Json/localization
+Excel2Json/csharp

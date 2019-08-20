@@ -1,8 +1,11 @@
 ﻿using System;
+using UnityEngine;
 using GameFramework.Setting;
 
 public class SettingHelper : ISettingHelper
 {
+    private bool m_MarkChanged = false;
+
     /// <summary>
     /// 加载配置。
     /// </summary>
@@ -18,7 +21,13 @@ public class SettingHelper : ISettingHelper
     /// <returns>是否保存配置成功。</returns>
     public bool Save()
     {
-        return true;
+        if (m_MarkChanged)
+        {
+            PlayerPrefs.Save();
+            m_MarkChanged = false;
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -28,7 +37,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>指定的配置项是否存在。</returns>
     public bool HasSetting(string settingName)
     {
-        return true;
+        return PlayerPrefs.HasKey(Encrypt(settingName));
     }
 
     /// <summary>
@@ -37,6 +46,7 @@ public class SettingHelper : ISettingHelper
     /// <param name="settingName">要移除配置项的名称。</param>
     public void RemoveSetting(string settingName)
     {
+        PlayerPrefs.DeleteKey(Encrypt(settingName));
     }
 
     /// <summary>
@@ -44,6 +54,7 @@ public class SettingHelper : ISettingHelper
     /// </summary>
     public void RemoveAllSettings()
     {
+        PlayerPrefs.DeleteAll();
     }
 
     /// <summary>
@@ -53,7 +64,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的布尔值。</returns>
     public bool GetBool(string settingName)
     {
-        return true;
+        return Decrypt<bool>(PlayerPrefs.GetString(Encrypt(settingName)));
     }
 
     /// <summary>
@@ -64,7 +75,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的布尔值。</returns>
     public bool GetBool(string settingName, bool defaultValue)
     {
-        return true;
+        return Decrypt<bool>(PlayerPrefs.GetString(Encrypt(settingName), Encrypt(defaultValue)));
     }
 
     /// <summary>
@@ -74,7 +85,8 @@ public class SettingHelper : ISettingHelper
     /// <param name="value">要写入的布尔值。</param>
     public void SetBool(string settingName, bool value)
     {
-
+        PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
+        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -84,7 +96,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的整数值。</returns>
     public int GetInt(string settingName)
     {
-        return 0;
+        return Decrypt<int>(PlayerPrefs.GetString(Encrypt(settingName)));
     }
 
     /// <summary>
@@ -95,7 +107,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的整数值。</returns>
     public int GetInt(string settingName, int defaultValue)
     {
-        return 0;
+        return Decrypt<int>(PlayerPrefs.GetString(Encrypt(settingName), Encrypt(defaultValue)));
     }
 
     /// <summary>
@@ -105,7 +117,8 @@ public class SettingHelper : ISettingHelper
     /// <param name="value">要写入的整数值。</param>
     public void SetInt(string settingName, int value)
     {
-
+        PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
+        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -115,7 +128,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的浮点数值。</returns>
     public float GetFloat(string settingName)
     {
-        return 0f;
+        return Decrypt<float>(PlayerPrefs.GetString(Encrypt(settingName)));
     }
 
     /// <summary>
@@ -126,7 +139,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的浮点数值。</returns>
     public float GetFloat(string settingName, float defaultValue)
     {
-        return 0f;
+        return Decrypt<float>(PlayerPrefs.GetString(Encrypt(settingName), Encrypt(defaultValue)));
     }
 
     /// <summary>
@@ -136,6 +149,8 @@ public class SettingHelper : ISettingHelper
     /// <param name="value">要写入的浮点数值。</param>
     public void SetFloat(string settingName, float value)
     {
+        PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
+        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -145,7 +160,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的字符串值。</returns>
     public string GetString(string settingName)
     {
-        return string.Empty;
+        return Decrypt<string>(PlayerPrefs.GetString(Encrypt(settingName)));
     }
 
     /// <summary>
@@ -156,7 +171,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>读取的字符串值。</returns>
     public string GetString(string settingName, string defaultValue)
     {
-        return string.Empty;
+        return Decrypt<string>(PlayerPrefs.GetString(Encrypt(settingName), Encrypt(defaultValue)));
     }
 
     /// <summary>
@@ -166,7 +181,8 @@ public class SettingHelper : ISettingHelper
     /// <param name="value">要写入的字符串值。</param>
     public void SetString(string settingName, string value)
     {
-
+        PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
+        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -223,6 +239,7 @@ public class SettingHelper : ISettingHelper
     /// <param name="obj">要写入的对象。</param>
     public void SetObject<T>(string settingName, T obj)
     {
+        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -232,5 +249,23 @@ public class SettingHelper : ISettingHelper
     /// <param name="obj">要写入的对象。</param>
     public void SetObject(string settingName, object obj)
     {
+        m_MarkChanged = true;
+    }
+
+    private string Encrypt<T>(T value)
+    {
+        // TODO: 加密
+        return value.ToString();
+    }
+
+    private T Decrypt<T>(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return default(T);
+        }
+
+        // TODO: 解密
+        return (T)Convert.ChangeType(value, typeof(T));
     }
 }

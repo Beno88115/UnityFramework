@@ -19,8 +19,10 @@ public class AppFacade : SingletonMono<AppFacade>
     public void Initialize()
     {
         ObjectPoolManager.Instance.Initialize();
+        SettingManager.Instance.Initialize();
         ResourceManager.Instance.Initialize();
         ConfigManager.Instance.Initialize();
+        LocalizationManager.Instance.Initialize();
         UIManager.Instance.Initialize();
 
         ResourceManager.Instance.InitResources();

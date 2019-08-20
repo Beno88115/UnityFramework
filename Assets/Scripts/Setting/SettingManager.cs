@@ -7,11 +7,9 @@ public class SettingManager : SingletonMono<SettingManager>
 {
     private GameFramework.Setting.ISettingModule m_SettingModule;
 
-    protected override void Awake()
+    public void Initialize()
     {
-        base.Awake();
-
-        this.m_SettingModule = GameFrameworkEntry.GetModule<GameFramework.Setting.SettingModule>();
+        this.m_SettingModule = GameFrameworkEntry.GetModule<GameFramework.Setting.ISettingModule>();
         this.m_SettingModule.SetSettingHelper(new SettingHelper());
     }
 }

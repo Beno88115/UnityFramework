@@ -2,15 +2,27 @@
 using UnityEngine;
 using GameFramework;
 using GameFramework.Localization;
+using SimpleJSON;
+using System.Collections.Generic;
 
 public class LocalizationHelper : ILocalizationHelper
 {
+    private GameFramework.Localization.ILocalizationModule m_LocalizationModule;
+
+    public LocalizationHelper()
+    {
+        m_LocalizationModule = GameFrameworkEntry.GetModule<GameFramework.Localization.ILocalizationModule>();
+    }
+
     /// <summary>
     /// 获取系统语言。
     /// </summary>
-    public Language SystemLanguage
+    public GameFramework.Localization.Language SystemLanguage
     {
-        get;
+        get
+        {
+            return GameFramework.Localization.Language.English;
+        }
     }
 
     /// <summary>
@@ -22,7 +34,11 @@ public class LocalizationHelper : ILocalizationHelper
     /// <returns>是否加载成功。</returns>
     public bool LoadDictionary(object dictionaryAsset, LoadType loadType, object userData)
     {
-        return true;
+        TextAsset textAsset = dictionaryAsset as TextAsset;
+        if (textAsset == null)
+            return false;
+
+        return m_LocalizationModule.ParseDictionary(textAsset.text, userData);
     }
 
     /// <summary>
@@ -33,6 +49,13 @@ public class LocalizationHelper : ILocalizationHelper
     /// <returns>是否解析字典成功。</returns>
     public bool ParseDictionary(string text, object userData)
     {
+        JSONNode node = JSONNode.Parse(text);
+        var iter = node.GetEnumerator();
+        while (iter.MoveNext()) 
+        {
+            KeyValuePair<string, JSONNode> pair = (KeyValuePair<string, JSONNode>)iter.Current;
+            m_LocalizationModule.AddRawString(pair.Key, pair.Value);
+        }
         return true;
     }
 
@@ -64,6 +87,5 @@ public class LocalizationHelper : ILocalizationHelper
     /// <param name="dictionaryAsset">要释放的字典资源。</param>
     public void ReleaseDictionaryAsset(object dictionaryAsset)
     {
-
     }
 }
