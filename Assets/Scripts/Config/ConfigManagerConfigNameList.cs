@@ -4,5 +4,5 @@ using UnityEngine;
 
 public partial class ConfigManager : SingletonMono<ConfigManager>
 {
-    private string[] m_ConfigNameList = { "", "", "" };
+    private string[] m_ConfigNameList = { "Gift", "Prop", "Shop" };
 }

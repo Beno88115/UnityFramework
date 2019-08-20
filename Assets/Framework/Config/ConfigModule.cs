@@ -674,7 +674,7 @@ namespace GameFramework.Config
             IEnumerable<object> dataRowSegments = null;
             try
             {
-                dataRowSegments = m_ConfigHelper.GetDataRowSegments(text);
+                dataRowSegments = m_ConfigHelper.GetConfigRowSegments(text);
             }
             catch (Exception exception)
             {
@@ -705,7 +705,7 @@ namespace GameFramework.Config
             IEnumerable<object> dataRowSegments = null;
             try
             {
-                dataRowSegments = m_ConfigHelper.GetDataRowSegments(bytes);
+                dataRowSegments = m_ConfigHelper.GetConfigRowSegments(bytes);
             }
             catch (Exception exception)
             {
@@ -736,7 +736,7 @@ namespace GameFramework.Config
             IEnumerable<object> dataRowSegments = null;
             try
             {
-                dataRowSegments = m_ConfigHelper.GetDataRowSegments(stream);
+                dataRowSegments = m_ConfigHelper.GetConfigRowSegments(stream);
             }
             catch (Exception exception)
             {

@@ -29,21 +29,21 @@ namespace GameFramework.Config
         /// </summary>
         /// <param name="text">要解析的数据表文本。</param>
         /// <returns>数据表行片段。</returns>
-        IEnumerable<object> GetDataRowSegments(string text);
+        IEnumerable<object> GetConfigRowSegments(string text);
 
         /// <summary>
         /// 获取数据表行片段。
         /// </summary>
         /// <param name="bytes">要解析的数据表二进制流。</param>
         /// <returns>数据表行片段。</returns>
-        IEnumerable<object> GetDataRowSegments(byte[] bytes);
+        IEnumerable<object> GetConfigRowSegments(byte[] bytes);
 
         /// <summary>
         /// 获取数据表行片段。
         /// </summary>
         /// <param name="stream">要解析的数据表二进制流。</param>
         /// <returns>数据表行片段。</returns>
-        IEnumerable<object> GetDataRowSegments(Stream stream);
+        IEnumerable<object> GetConfigRowSegments(Stream stream);
 
         /// <summary>
         /// 释放数据表资源。

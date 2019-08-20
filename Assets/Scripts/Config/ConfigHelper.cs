@@ -23,6 +23,17 @@ public class ConfigHelper : IConfigHelper
     /// <returns>是否加载成功。</returns>
     public bool LoadConfigTable(object configTableAsset, LoadType loadType, object userData)
     {
+        TextAsset textAsset = configTableAsset as TextAsset;
+        if (textAsset == null)
+            return false;
+
+        string configTableName = userData as string;
+        string configRowTypeName = GameFramework.Utility.Text.Format("Config{0}Row", configTableName);
+        System.Type configRowType = System.Type.GetType(configRowTypeName);
+        if (configRowType == null)
+            return false;
+
+        m_ConfigModule.CreateConfigTable(configRowType, configTableName, textAsset.text);
         return true;
     }
 
@@ -31,10 +42,11 @@ public class ConfigHelper : IConfigHelper
     /// </summary>
     /// <param name="text">要解析的数据表文本。</param>
     /// <returns>数据表行片段。</returns>
-    public IEnumerable<object> GetDataRowSegments(string text)
+    public IEnumerable<object> GetConfigRowSegments(string text)
     {
-        // JSONNode node = JSON.Parse(text);
-        // return node.GetEnumerator();
+        JSONNode node = JSON.Parse(text);
+        if (node != null)
+            return node.Children;
         return null;
     }
 
@@ -43,7 +55,7 @@ public class ConfigHelper : IConfigHelper
     /// </summary>
     /// <param name="bytes">要解析的数据表二进制流。</param>
     /// <returns>数据表行片段。</returns>
-    public IEnumerable<object> GetDataRowSegments(byte[] bytes)
+    public IEnumerable<object> GetConfigRowSegments(byte[] bytes)
     {
         return null;
     }
@@ -53,7 +65,7 @@ public class ConfigHelper : IConfigHelper
     /// </summary>
     /// <param name="stream">要解析的数据表二进制流。</param>
     /// <returns>数据表行片段。</returns>
-    public IEnumerable<object> GetDataRowSegments(Stream stream)
+    public IEnumerable<object> GetConfigRowSegments(Stream stream)
     {
         return null;
     }
