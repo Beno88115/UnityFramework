@@ -21,8 +21,7 @@ public class SettingHelper : ISettingHelper
     /// <returns>是否保存配置成功。</returns>
     public bool Save()
     {
-        if (m_MarkChanged)
-        {
+        if (m_MarkChanged) {
             PlayerPrefs.Save();
             m_MarkChanged = false;
             return true;

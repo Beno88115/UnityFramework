@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class LocalizedText : MonoBehaviour
+[RequireComponent(typeof(Text))]
+public class LocalizedText : MonoBehaviour 
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    Localized.Text m_LanguageID = Localized.Text.UNKNOWN;
 
-    // Update is called once per frame
-    void Update()
+	void Start()
     {
-        
-    }
+        if (m_LanguageID != Localized.Text.UNKNOWN) {
+            GetComponent<Text>().text = LocalizationManager.Instance.GetString(m_LanguageID);
+        }
+	}
 }

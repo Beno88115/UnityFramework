@@ -52,13 +52,11 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
         m_LoadConfigsFailureCallback = failureCallback;
 
         m_LoadCompleteConfigList.Clear();
-        for (int i = 0; i < this.m_ConfigNameList.Length; ++i)
-        {
+        for (int i = 0; i < this.m_ConfigNameList.Length; ++i) {
             m_LoadCompleteConfigList.Add(m_ConfigNameList[i], false);
         }
 
-        for (int i = 0; i < this.m_ConfigNameList.Length; ++i)
-        {
+        for (int i = 0; i < this.m_ConfigNameList.Length; ++i) {
             string configName = this.m_ConfigNameList[i];
             this.m_ConfigModule.LoadConfigTable(configName, LoadType.Text, configName);
         }
@@ -190,13 +188,11 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
         string configTableName = e.UserData as string;
         m_LoadCompleteConfigList[configTableName] = true;
 
-        if (m_LoadConfigsProgressCallback != null)
-        {
+        if (m_LoadConfigsProgressCallback != null) {
             m_LoadConfigsProgressCallback(configTableName);
         }
 
-        if (HasLoadCompleted())
-        {
+        if (HasLoadCompleted()) {
             m_LoadConfigsCompleteCallback();
         }
     }
@@ -204,10 +200,8 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
     private bool HasLoadCompleted()
     {
         bool hasCompleted = true;
-        foreach (var keyValue in m_LoadCompleteConfigList)
-        {
-            if (!keyValue.Value)
-            {
+        foreach (var keyValue in m_LoadCompleteConfigList) {
+            if (!keyValue.Value) {
                 hasCompleted = false;
                 break;
             }
@@ -217,8 +211,7 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
 
     private void OnLoadConfigFailure(object sender, GameFramework.Config.LoadConfigFailureEventArgs e)
     {
-        if (m_LoadConfigsFailureCallback != null)
-        {
+        if (m_LoadConfigsFailureCallback != null) {
             m_LoadConfigsFailureCallback(e.ConfigTableAssetName, e.ErrorMessage);
         }
     }

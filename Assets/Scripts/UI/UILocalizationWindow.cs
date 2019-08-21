@@ -44,6 +44,6 @@ public class UILocalizationWindow : UIWindow
     {
         Debug.Log("==============load localization success");
 
-        Debug.Log(LocalizationManager.Instance.GetString(Language.AD_ISNOT_READY));
+        Debug.Log(LocalizationManager.Instance.GetString(Localized.Text.AD_ISNOT_READY));
     }
 }

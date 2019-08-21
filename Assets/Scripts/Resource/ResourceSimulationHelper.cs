@@ -15,13 +15,10 @@ public class ResourceSimulationHelper : IResourceSimulationHelper
     {
 #if UNITY_EDITOR
         string[] assetPaths = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(resourceName, assetName);
-        if (assetPaths.Length != 0) 
-        {
-            for (int i = 0; i < assetPaths.Length; ++i) 
-            {
+        if (assetPaths.Length != 0) {
+            for (int i = 0; i < assetPaths.Length; ++i) {
                 Object target = AssetDatabase.LoadAssetAtPath(assetPaths[i], type ?? typeof(Object));
-                if (target != null) 
-                {
+                if (target != null) {
                     return target;
                 }
             }

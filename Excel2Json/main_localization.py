@@ -3,7 +3,7 @@ import sys
 import os
 # from csharp_generate import *
 from localization_generate import *
-from macro_generate import *
+from localization_macro_generate import *
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         config_items = ''
 
         localization_generate = LocalizationGenerate()
-        macro_generate = MACROGenerate()
+        localization_macro_generate = MACROGenerate()
 
         for parent, dirnames, filenames in os.walk(sys.argv[1]):
             for filename in filenames:
@@ -43,8 +43,8 @@ if __name__ == '__main__':
 
                 # MACRO
                 # 宏定义文件，只读取表的id及macro字段
-                macro_generate.load_xls_file(full_name)
-                macro_generate.export_macro()
+                localization_macro_generate.load_xls_file(full_name)
+                localization_macro_generate.export_macro()
 
         print '==========================END======================='
 

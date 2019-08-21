@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LocalizedImage : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField]
+    Localized.Image m_ImageID = Localized.Image.UNKNOWN;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (m_ImageID != Localized.Image.UNKNOWN) {
+            GetComponent<Image>().SetSprite(LocalizationManager.Instance.GetSpriteAssetName(m_ImageID));
+        }
     }
 }

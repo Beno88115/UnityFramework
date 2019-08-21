@@ -11,17 +11,14 @@ public class Singleton<T> where T : class
     {
         get
         {
-            if (s_Instance == null)
-            {
+            if (s_Instance == null) {
                 s_Instance = (T)Activator.CreateInstance(typeof(T), true);
                 Type type = typeof(T);
                 MethodInfo mi = type.GetMethod("OnInit");
-                if (mi != null)
-                {
+                if (mi != null) {
                     mi.Invoke(s_Instance, null);
                 }
             }
-
             return s_Instance;
         }
     }
@@ -31,11 +28,9 @@ public class Singleton<T> where T : class
     {
         Type type = typeof(T);
         MethodInfo mi = type.GetMethod("OnDestroy");
-        if (mi != null)
-        {
+        if (mi != null) {
             mi.Invoke(s_Instance, null);
         }
-
         s_Instance = null;
         return;
     }

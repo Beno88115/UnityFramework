@@ -63,13 +63,11 @@ public class UIManager : SingletonMono<UIManager>
 
     private bool AddGroup(string groupName, int depth)
     {
-        if (m_UIModule.HasUIGroup(groupName))
-        {
+        if (m_UIModule.HasUIGroup(groupName)) {
             return false;
         }
         
-        if (m_UIModule.AddUIGroup(groupName, depth, new UIGroupHelper()))
-        {
+        if (m_UIModule.AddUIGroup(groupName, depth, new UIGroupHelper())) {
             GameObject group = new GameObject(groupName);
             var uiGroup = group.AddComponent<UIGroup>();
             uiGroup.Name = groupName;
