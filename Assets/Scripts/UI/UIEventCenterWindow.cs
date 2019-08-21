@@ -16,6 +16,8 @@ public class UIEventCenterWindow : UIWindow
     [SerializeField]
     Button btnBlue;
     [SerializeField]
+    Button btnBack;
+    [SerializeField]
     Button btn1;
     [SerializeField]
     Button btn2;
@@ -35,6 +37,7 @@ public class UIEventCenterWindow : UIWindow
         this.btnRed.onClick.AddListener(OnRedButtonClicked);
         this.btnGreen.onClick.AddListener(OnGreenButtonClicked);
         this.btnBlue.onClick.AddListener(OnBlueButtonClicked);
+        this.btnBack.onClick.AddListener(OnBackButtonClicked);
 
         this.btn1.onClick.AddListener(()=>{ m_Observers.Add(btn1); btn1.interactable = false; });
         this.btn2.onClick.AddListener(()=>{ m_Observers.Add(btn2); btn2.interactable = false; });
@@ -59,6 +62,11 @@ public class UIEventCenterWindow : UIWindow
     void OnBlueButtonClicked()
     {
         EventManager.Instance.Fire(this, CustomEventArgs.Create(CUSTOM_EVENT_ID, Color.blue));
+    }
+
+    void OnBackButtonClicked()
+    {
+        UIManager.Instance.PopWindow(this.SerialId);
     }
 
     void OnHandleCustomEvent(object sender, GameEventArgs e)
