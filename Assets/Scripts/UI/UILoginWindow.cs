@@ -12,12 +12,15 @@ public class UILoginWindow : UIWindow
     Button btnConfig;
     [SerializeField]
     Button btnLocalization;
+    [SerializeField]
+    Button btnEvent;
 
     void Awake()
     {
         this.btnLogIn.onClick.AddListener(this.OnLoginButtonClicked);
         this.btnConfig.onClick.AddListener(this.OnConfigButtonClicked);
         this.btnLocalization.onClick.AddListener(this.OnLocalizationButtonClicked);
+        this.btnEvent.onClick.AddListener(this.OnEventButtonClicked);
     }
 
     private void OnLoginButtonClicked()
@@ -34,6 +37,11 @@ public class UILoginWindow : UIWindow
     private void OnLocalizationButtonClicked()
     {
         UIManager.Instance.PushWindow("UILocalization");
+    }
+
+    private void OnEventButtonClicked()
+    {
+        UIManager.Instance.PushWindow("UIEventCenter");
     }
 
     private void OnLoadConfigsProgressCallback(string configTableName)
