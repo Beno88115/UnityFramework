@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using GameFramework;
+using GameFramework.UI;
+using GameFramework.Resource;
+using GameFramework.ObjectPool;
 
 public class UIManager : SingletonMono<UIManager> 
 {
     private static readonly string kCanvasName = "UICanvas";
 
-    private GameFramework.UI.IUIModule m_UIModule = null;
+    private IUIModule m_UIModule = null;
     private Dictionary<string, UIGroup> m_Groups = new Dictionary<string, UIGroup>();
     private Canvas m_Canvas = null;
 
@@ -20,10 +23,10 @@ public class UIManager : SingletonMono<UIManager>
 
     public void Initialize()
     {
-        this.m_UIModule = GameFrameworkEntry.GetModule<GameFramework.UI.IUIModule>();
+        this.m_UIModule = GameFrameworkEntry.GetModule<IUIModule>();
         this.m_UIModule.SetUIWindowHelper(new UIWindowHelper(m_Groups));
-        this.m_UIModule.SetResourceModule(GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceModule>());
-        this.m_UIModule.SetObjectPoolModule(GameFrameworkEntry.GetModule<GameFramework.ObjectPool.IObjectPoolModule>());
+        this.m_UIModule.SetResourceModule(GameFrameworkEntry.GetModule<IResourceModule>());
+        this.m_UIModule.SetObjectPoolModule(GameFrameworkEntry.GetModule<IObjectPoolModule>());
 
         this.m_UIModule.OpenUIWindowSuccess += this.OnOpenWindowSuccess;
         this.m_UIModule.OpenUIWindowFailure += this.OnOpenWindowFailure;
@@ -164,27 +167,27 @@ public class UIManager : SingletonMono<UIManager>
         this.PopWindow(serialId, userData);
     }
 
-    private void OnOpenWindowSuccess(object sender, GameFramework.UI.OpenUIWindowSuccessEventArgs e)
+    private void OnOpenWindowSuccess(object sender, OpenUIWindowSuccessEventArgs e)
     {
         Debug.LogFormat("OnOpenWindowSuccess[{0}]", e.UIWindow.UIWindowAssetName);
     }
 
-    private void OnOpenWindowFailure(object sender, GameFramework.UI.OpenUIWindowFailureEventArgs e)
+    private void OnOpenWindowFailure(object sender, OpenUIWindowFailureEventArgs e)
     {
         Debug.LogFormat("OnOpenWindowFailure[{0}]", e.UIWindowAssetName);
     }
 
-    private void OnOpenWindowUpdate(object sender, GameFramework.UI.OpenUIWindowUpdateEventArgs e)
+    private void OnOpenWindowUpdate(object sender, OpenUIWindowUpdateEventArgs e)
     {
         Debug.LogFormat("OnOpenWindowUpdate[{0}]", e.UIWindowAssetName);
     }
 
-    private void OnOpenWindowDependencyAsset(object sender, GameFramework.UI.OpenUIWindowDependencyAssetEventArgs e)
+    private void OnOpenWindowDependencyAsset(object sender, OpenUIWindowDependencyAssetEventArgs e)
     {
         Debug.LogFormat("OnOpenWindowDependencyAsset[{0}]", e.DependencyAssetName);
     }
 
-    private void OnCloseWindowComplete(object sender, GameFramework.UI.CloseUIWindowCompleteEventArgs e)
+    private void OnCloseWindowComplete(object sender, CloseUIWindowCompleteEventArgs e)
     {
         Debug.LogFormat("OnCloseWindowComplete[{0}]", e.UIWindowAssetName);
     }

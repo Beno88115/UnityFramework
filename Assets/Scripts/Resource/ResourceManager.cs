@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using UnityEngine;
 using GameFramework;
 using GameFramework.Resource;
 using GameFramework.Download;
 using GameFramework.ObjectPool;
+using System.Collections;
+using System.Collections.Generic;
 
 public partial class ResourceManager : SingletonMono<ResourceManager> 
 {
@@ -45,8 +45,8 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
             this.m_ResModule.AddLoadResourceAgentHelper(new LoadResourceAgentHelper());
         }
 
-        this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<IObjectPoolModule>();
-        this.m_ObjectPool = this.m_ObjectPoolModule.CreateSingleSpawnObjectPool<ResObject>("Res Object Pool");
+        // this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<IObjectPoolModule>();
+        // this.m_ObjectPool = this.m_ObjectPoolModule.CreateSingleSpawnObjectPool<ResObject>("Res Object Pool");
     }
 
     public void InitResources()

@@ -1,11 +1,12 @@
 ﻿using System;
 using GameFramework;
 using GameFramework.Config;
+using GameFramework.Resource;
 using System.Collections.Generic;
 
 public partial class ConfigManager : SingletonMono<ConfigManager> 
 {
-    private GameFramework.Config.IConfigModule m_ConfigModule;
+    private IConfigModule m_ConfigModule;
 
     private LoadConfigsProgressCallback m_LoadConfigsProgressCallback;
     private LoadConfigsCompleteCallback m_LoadConfigsCompleteCallback;
@@ -15,9 +16,9 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
 
     public void Initialize()
     {
-        this.m_ConfigModule = GameFrameworkEntry.GetModule<GameFramework.Config.IConfigModule>();
+        this.m_ConfigModule = GameFrameworkEntry.GetModule<IConfigModule>();
         this.m_ConfigModule.SetConfigHelper(new ConfigHelper());
-        this.m_ConfigModule.SetResourceModule(GameFrameworkEntry.GetModule<GameFramework.Resource.IResourceModule>());
+        this.m_ConfigModule.SetResourceModule(GameFrameworkEntry.GetModule<IResourceModule>());
 
         this.m_ConfigModule.LoadConfigSuccess += OnLoadConfigSuccess;
         this.m_ConfigModule.LoadConfigFailure += OnLoadConfigFailure;
@@ -183,7 +184,7 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
         this.m_ConfigModule.GetConfigTable<T>().GetAllConfigRows(results);
     }
 
-    private void OnLoadConfigSuccess(object sender, GameFramework.Config.LoadConfigSuccessEventArgs e)
+    private void OnLoadConfigSuccess(object sender, LoadConfigSuccessEventArgs e)
     {
         string configTableName = e.UserData as string;
         m_LoadCompleteConfigList[configTableName] = true;
@@ -209,18 +210,23 @@ public partial class ConfigManager : SingletonMono<ConfigManager>
         return hasCompleted;
     }
 
-    private void OnLoadConfigFailure(object sender, GameFramework.Config.LoadConfigFailureEventArgs e)
+    private void OnLoadConfigFailure(object sender, LoadConfigFailureEventArgs e)
     {
         if (m_LoadConfigsFailureCallback != null) {
             m_LoadConfigsFailureCallback(e.ConfigTableAssetName, e.ErrorMessage);
         }
     }
 
-    private void OnLoadConfigUpdate(object sender, GameFramework.Config.LoadConfigUpdateEventArgs e)
+    private void OnLoadConfigUpdate(object sender, LoadConfigUpdateEventArgs e)
     {
     }
 
-    private void OnLoadConfigDependencyAsset(object sender, GameFramework.Config.LoadConfigDependencyAssetEventArgs e)
+    private void OnLoadConfigDependencyAsset(object sender, LoadConfigDependencyAssetEventArgs e)
     {
+    }
+
+    protected override bool IsGlobalScope
+    {
+        get { return true; }
     }
 }
