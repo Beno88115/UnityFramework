@@ -11,6 +11,8 @@ public class UIResourceWindow : UIWindow
     Button btnBack;
     [SerializeField]
     Image image;
+    [SerializeField]
+    Image image1;
 
     void Start()
     {
@@ -18,9 +20,17 @@ public class UIResourceWindow : UIWindow
         this.btnBack.onClick.AddListener(OnBackButtonClicked);
     }
 
+    public override void OnOpen(object userData)
+    {
+        base.OnOpen(userData);
+        this.image.sprite = null;
+        this.image1.sprite = null;
+    }
+
     void OnLoadSpriteButtonClicked()
     {
         image.SetSprite("Chess");
+        image1.SetSprite("Chess");
     }
 
     void OnBackButtonClicked()

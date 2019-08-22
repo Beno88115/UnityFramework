@@ -12,14 +12,14 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
     private IResourceModule m_ResModule;
     private IObjectPoolModule m_ObjectPoolModule;
     private IObjectPool<ResObject> m_ObjectPool;
-    private Dictionary<string, LoadAssetCompleteCallback> m_AssetBeingLoaded;
+    private Dictionary<string, List<LoadAssetCompleteCallback>> m_AssetBeingLoaded;
     private LoadAssetCallbacks m_LoadAssetCallbacks;
 
     protected override void Awake()
     {
         base.Awake();
 
-        m_AssetBeingLoaded = new Dictionary<string, LoadAssetCompleteCallback>();
+        m_AssetBeingLoaded = new Dictionary<string, List<LoadAssetCompleteCallback>>();
         m_LoadAssetCallbacks = new LoadAssetCallbacks(LoadAssetSuccessCallback, LoadAssetFailureCallback, LoadAssetUpdateCallback, LoadAssetDependencyAssetCallback);
     }
 
@@ -122,7 +122,13 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         //     callback(resObject.Target);
         // }
 
-        m_AssetBeingLoaded.Add(assetName, callback);
+        List<LoadAssetCompleteCallback> callbacks = null;
+        if (!m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
+            callbacks = new List<LoadAssetCompleteCallback>();
+            m_AssetBeingLoaded[assetName] = callbacks;
+        }
+        callbacks.Add(callback);
+
         m_ResModule.LoadAsset(assetName, assetType, m_LoadAssetCallbacks, userData);
     }
 
@@ -144,10 +150,15 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
     private void LoadAssetSuccessCallback(string assetName, object assetObject, float duration, object userData)
     {
-        LoadAssetCompleteCallback callback = null;
-        if (m_AssetBeingLoaded.TryGetValue(assetName, out callback)) {
-            if (callback != null) {
-                callback(assetObject);
+        List<LoadAssetCompleteCallback> callbacks = null;
+        if (m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
+            if (callbacks != null) {
+                for (int i = 0; i < callbacks.Count; ++i) {
+                    LoadAssetCompleteCallback callback = callbacks[i];
+                    if (callback != null) {
+                        callback(assetObject);
+                    }
+                }
             }
             m_AssetBeingLoaded.Remove(assetName);
         }
