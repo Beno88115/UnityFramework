@@ -25,6 +25,7 @@ public class AppFacade : SingletonMono<AppFacade>
         ConfigManager.Instance.Initialize();
         LocalizationManager.Instance.Initialize();
         UIManager.Instance.Initialize();
+        NetworkManager.Instance.Initialize();
         DataManager.Instance.Initialize();
 
         ResourceManager.Instance.InitResources();

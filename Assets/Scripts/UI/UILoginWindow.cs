@@ -13,6 +13,8 @@ public class UILoginWindow : UIWindow
     Button btnEvent;
     [SerializeField]
     Button btnRes;
+    [SerializeField]
+    Button btnNetwork;
 
     void Awake()
     {
@@ -21,6 +23,7 @@ public class UILoginWindow : UIWindow
         this.btnLocalization.onClick.AddListener(this.OnLocalizationButtonClicked);
         this.btnEvent.onClick.AddListener(this.OnEventButtonClicked);
         this.btnRes.onClick.AddListener(this.OnResButtonClicked);
+        this.btnNetwork.onClick.AddListener(this.OnNetworkButtonClicked);
     }
 
     private void OnLoginButtonClicked()
@@ -46,5 +49,10 @@ public class UILoginWindow : UIWindow
     private void OnResButtonClicked()
     {
         UIManager.Instance.PushWindow("UIResource");
+    }
+
+    private void OnNetworkButtonClicked()
+    {
+        UIManager.Instance.PushWindow("UINetwork");
     }
 }
