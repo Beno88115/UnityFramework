@@ -80,4 +80,9 @@ public class EventManager : SingletonMono<EventManager>
     {
         m_EventModule.FireNow(sender, e);
     }
+
+    protected override bool IsGlobalScope
+    {
+        get { return true; }
+    }
 }

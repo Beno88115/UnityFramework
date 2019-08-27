@@ -25,7 +25,7 @@ public class UINetworkWindow : UIWindow
 
     private void OnConnectButtonClicked()
     {
-        NetworkManager.Instance.Connect("127.0.0.1", 8001);
+        ModelManager.Instance.Get<LoginModel>().Login();
     }
 
     private void OnBackButtonClicked()

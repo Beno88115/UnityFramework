@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using UnityEngine;
 using GameFramework;
 using GameFramework.Network;
 using System.Collections.Generic;
@@ -69,7 +68,7 @@ public class NetworkChannelHelper : INetworkChannelHelper
             return false;
         }
     
-        string msg = string.Format("{{\"id\":{0}, \"msg\":\"{1}\"}}", packet.Id, body);
+        string msg = string.Format("{{\"id\":{0}, \"msg\":{1}}}", packet.Id, body);
         byte[] bytes = Encoding.UTF8.GetBytes(msg);
 
         List<byte> buffers = new List<byte>();
@@ -114,8 +113,8 @@ public class NetworkChannelHelper : INetworkChannelHelper
             return null;
         }
 
-        byte[] bytes = new byte[packetHeader.PacketLength - PacketHeaderLength];
-        source.Read(bytes, PacketHeaderLength, bytes.Length);
+        byte[] bytes = new byte[packetHeader.PacketLength];
+        source.Read(bytes, 0, bytes.Length);
 
         string msg = Encoding.UTF8.GetString(bytes);
         if (string.IsNullOrEmpty(msg)) {
@@ -137,7 +136,7 @@ public class NetworkChannelHelper : INetworkChannelHelper
             return null;
         }
 
-        Packet packet = ReferencePool.Acquire<UserPacket>();
+        Packet packet = (Packet)ReferencePool.Acquire(type);
         packet.Deserialize(node["msg"]);
         return packet;
     }

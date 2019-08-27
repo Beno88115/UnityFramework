@@ -12,4 +12,9 @@ public class SettingManager : SingletonMono<SettingManager>
         this.m_SettingModule = GameFrameworkEntry.GetModule<GameFramework.Setting.ISettingModule>();
         this.m_SettingModule.SetSettingHelper(new SettingHelper());
     }
+
+    protected override bool IsGlobalScope
+    {
+        get { return true; }
+    }
 }

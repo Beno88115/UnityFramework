@@ -89,4 +89,9 @@ public partial class LocalizationManager : SingletonMono<LocalizationManager>
     private void OnLoadDictionaryDependencyAsset(object sender, GameFramework.Localization.LoadDictionaryDependencyAssetEventArgs e)
     {
     }
+
+    protected override bool IsGlobalScope
+    {
+        get { return true; }
+    }
 }
