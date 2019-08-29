@@ -33,6 +33,11 @@ public class UICryptWindow : UIWindow
         Debug.Log(Utility.Crypt.Base64Encode(Utility.Crypt.HashKey(handshake)));
 	    var hmac = Utility.Crypt.HMac64(Utility.Crypt.HashKey(handshake), secret);
         Debug.Log(Utility.Crypt.Base64Encode(hmac));
+
+        string token = string.Format("{0}@{1}:{2}", Utility.Crypt.Base64Encode("xbb"), Utility.Crypt.Base64Encode("sample"), Utility.Crypt.Base64Encode("123456"));
+        var etoken = Utility.Crypt.DesEncode(secret, token);
+        Debug.Log(etoken.Length);
+        Debug.Log(Utility.Crypt.Base64Encode(etoken));
     }
 
     private void OnBackButtonClicked()
