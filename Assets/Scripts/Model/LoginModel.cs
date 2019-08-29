@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class LoginModel : ModelBase 
@@ -26,12 +25,13 @@ public class LoginModel : ModelBase
         UserPacket up = new UserPacket();
         up.UserName = "xbb";
         up.Password = "123456";
+        up.Address = "UNIT 1904 19/F PODIUM PLAZA 5 HANOI ROAD TSIM SHA TSUI KL";
         NetworkManager.Instance.Send(up);
     }
 
     private void OnEchoMessage(object sender, CustomEventArgs e)
     {
         UserPacket up = (UserPacket)e.UserData;
-        UnityEngine.Debug.Log("name:" + up.UserName + ", pwd:" + up.Password);
+        UnityEngine.Debug.Log("name:" + up.UserName + ", pwd:" + up.Password + ", address:" + up.Address);
     }
 }

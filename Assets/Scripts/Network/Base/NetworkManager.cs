@@ -32,12 +32,14 @@ public class NetworkManager : SingletonMono<NetworkManager>
 
     public void Subscribe(int id, EventHandler<CustomEventArgs> handler)
     {
-        m_EventPool.Subscribe(id, handler);
+        this.m_EventPool.Subscribe(id, handler);
     }
 
     public void Unsubscribe(int id, EventHandler<CustomEventArgs> handler)
     {
-        m_EventPool.Unsubscribe(id, handler);
+        if (this.m_EventPool.EventCount > 0) {
+            this.m_EventPool.Unsubscribe(id, handler);
+        }
     }
 
     public void Connect(string ip, int port)
@@ -62,7 +64,6 @@ public class NetworkManager : SingletonMono<NetworkManager>
 
     private void OnNetworkMessage(object sender, Packet packet)
     {
-        UnityEngine.Debug.Log("network message");
         this.m_EventPool.FireNow(this, CustomEventArgs.Create(packet.Id, packet));
     }
 

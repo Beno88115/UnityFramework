@@ -7,12 +7,14 @@ public class UserPacket : Packet
     public override int Id { get { return 1000; } }
     public string UserName { get; set; }
     public string Password { get; set; }
+    public string Address { get; set; }
 
     public override object Serialize()
     {
         JSONObject jsonObject = new JSONObject();
         jsonObject["name"] = UserName;
         jsonObject["password"] = Password;
+        jsonObject["address"] = Address;
         return jsonObject.ToString();
     }
 
@@ -21,6 +23,7 @@ public class UserPacket : Packet
         JSONNode node = (JSONNode)data;
         UserName = node["name"];
         Password = node["password"];
+        Address = node["address"];
     }
 
     public override void Clear()

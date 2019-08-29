@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using GameFramework.UI;
 
+[DisallowMultipleComponent]
 public class UIWindow : MonoBehaviour, IUIWindow
 {
     /// <summary>

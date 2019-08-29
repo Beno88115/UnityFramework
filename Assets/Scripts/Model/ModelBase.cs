@@ -2,12 +2,12 @@
 
 public abstract class ModelBase : MonoBehaviour
 {
-    protected virtual void Awake()
+    protected virtual void OnEnable()
     {
         OnSubscribe();
     }
 
-    protected virtual void OnDestroy()
+    protected virtual void OnDisable()
     {
         OnUnSubscribe();
     }
