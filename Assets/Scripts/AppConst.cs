@@ -8,4 +8,7 @@
 
     // 加载资源的agent个数
     public static readonly int kResourceAgentCount = 3;
+
+    // 消息密钥
+    public static ulong kSecret = 0;
 }
