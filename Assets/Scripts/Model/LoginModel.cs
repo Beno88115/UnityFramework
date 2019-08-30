@@ -3,21 +3,41 @@ using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 using GameFramework;
+using System.Collections.Generic;
 
 /// <summary>
 /// 登录服务器登录验证。
 /// </summary>
 public class LoginModel : ModelBase 
 {
+    private class ThreadEvent
+    {
+        public GameFrameworkAction<object> Handle { get; private set; }
+        public object UserData { get; private set; }
+
+        public ThreadEvent(GameFrameworkAction<object> handle, object userData)
+        {
+            this.Handle = handle;
+            this.UserData = userData;
+        }
+    }
+
     private Socket m_Socket = null;
     private string m_UserName = null;
     private string m_UserPwd = null;
     private string m_ServerName = null;
 
+    Queue<ThreadEvent> m_ThreadEvents = null;
+
     public GameFrameworkAction<string> NetworkConnecteFailure = null;
     public GameFrameworkAction NetworkConnected = null;
     public GameFrameworkAction<string> LoginFailure = null;
     public GameFrameworkAction<int> LoginSuccess = null;
+
+    private void Awake()
+    {
+        m_ThreadEvents = new Queue<ThreadEvent>();
+    }
 
     protected override void OnSubscribe()
     {
@@ -40,7 +60,7 @@ public class LoginModel : ModelBase
 
         try {
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
-            int port = 8001;
+            int port = 8004;
 
             m_Socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             m_Socket.BeginConnect(ipAddress, port, OnConnectCallback, null);
@@ -64,18 +84,20 @@ public class LoginModel : ModelBase
             Debug.LogError(ex.Message);
             Close();
 
-            if (NetworkConnecteFailure != null) {
-                NetworkConnecteFailure(ex.Message);
-            }
+            RunOnMainThread((ud)=>{
+                if (NetworkConnecteFailure != null) {
+                    NetworkConnecteFailure((string)ud);
+                }
+            }, ex.Message);
             return;
         }
 
-        if (NetworkConnected != null) {
-            NetworkConnected();
-        }
-
-        
-        Authenticate();
+        RunOnMainThread((ud)=>{
+            if (NetworkConnected != null) {
+                NetworkConnected();
+            }
+            Authenticate();
+        });
     }
 
     private void Authenticate()
@@ -153,5 +175,26 @@ public class LoginModel : ModelBase
         }
         m_Socket.Close();
         m_Socket = null;
+    }
+    
+    private void RunOnMainThread(GameFrameworkAction<object> handle, object userData = null)
+    {
+        if (handle != null) {
+            lock (m_ThreadEvents) {
+                m_ThreadEvents.Enqueue(new ThreadEvent(handle, userData));
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (m_ThreadEvents.Count > 0) {
+            lock (m_ThreadEvents) {
+                ThreadEvent te = m_ThreadEvents.Dequeue();
+                if (te != null) {
+                    te.Handle(te.UserData);
+                }
+            }
+        }
     }
 }

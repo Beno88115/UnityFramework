@@ -43,13 +43,13 @@ public class UINetworkWindow : UIWindow
 
     private void OnNetworkConnecteFailure(string errMessage)
     {
-        // txtTip.text = "connect failure";
+        txtTip.text = "connect failure";
     }
 
     private void OnNetworkConnected()
     {
         Debug.Log("connect success");
-        // txtTip.text = "connect success";
+        txtTip.text = "connect success";
     }
 
     private void OnLoginFailure(string errMessage)
