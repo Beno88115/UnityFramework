@@ -60,7 +60,7 @@ public class LoginModel : ModelBase
 
         try {
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
-            int port = 8004;
+            int port = 8001;
 
             m_Socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             m_Socket.BeginConnect(ipAddress, port, OnConnectCallback, null);
@@ -91,6 +91,8 @@ public class LoginModel : ModelBase
             }, ex.Message);
             return;
         }
+
+        Debug.Log(m_Socket.RemoteEndPoint.Serialize().Family);
 
         RunOnMainThread((ud)=>{
             if (NetworkConnected != null) {
@@ -133,7 +135,6 @@ public class LoginModel : ModelBase
         }
         catch (Exception ex) {
             Debug.LogError(ex.Message);
-            Debug.LogError(ex.StackTrace);
             Close();
 
             if (LoginFailure != null) {
@@ -148,7 +149,12 @@ public class LoginModel : ModelBase
             string[] strs = result.Split(' ');
             if (strs.Length > 1) {
                 int code = Convert.ToInt32(strs[0]);
-                msg = System.Text.Encoding.UTF8.GetString(Utility.Crypt.Base64Decode(strs[1]));
+                if (code == 200) {
+                    msg = System.Text.Encoding.UTF8.GetString(Utility.Crypt.Base64Decode(strs[1]));
+                }
+                else {
+                    msg = result;
+                }
                 return code == 200;
             }
         }

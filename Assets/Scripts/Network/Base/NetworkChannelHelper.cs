@@ -63,17 +63,22 @@ public class NetworkChannelHelper : INetworkChannelHelper
             return false;
         }
 
-        string body = (string)packet.Serialize();
-        if (string.IsNullOrEmpty(body)) {
+        JSONNode body = (JSONNode)packet.Serialize();
+        if (body == null) {
             return false;
         }
     
-        string msg = string.Format("{{\"id\":{0}, \"msg\":{1}}}", packet.Id, body);
-        byte[] bytes = Encoding.UTF8.GetBytes(msg);
+        JSONObject json = new JSONObject();
+        json.Add("id", packet.Id);
+        json.Add("msg", body);
+
+        byte[] content = Encoding.UTF8.GetBytes(json.ToString());
+        byte[] header = BitConverter.GetBytes((ushort)content.Length);
+        Array.Reverse(header);
 
         List<byte> buffers = new List<byte>();
-        buffers.AddRange(BitConverter.GetBytes((short)bytes.Length));
-        buffers.AddRange(bytes);
+        buffers.AddRange(header);
+        buffers.AddRange(content);
 
         destination.Write(buffers.ToArray(), 0, buffers.Count);
         destination.Flush();
@@ -96,7 +101,9 @@ public class NetworkChannelHelper : INetworkChannelHelper
 
         byte[] bytes = new byte[PacketHeaderLength];
         source.Read(bytes, 0, PacketHeaderLength);
-        return new PacketHeader(BitConverter.ToInt16(bytes, 0));
+        Array.Reverse(bytes);
+
+        return new PacketHeader(BitConverter.ToUInt16(bytes, 0));
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ public class UserPacket : Packet
         jsonObject["name"] = UserName;
         jsonObject["password"] = Password;
         jsonObject["address"] = Address;
-        return jsonObject.ToString();
+        return jsonObject;
     }
 
     public override void Deserialize(object data)

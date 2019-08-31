@@ -33,7 +33,7 @@ public class UINetworkWindow : UIWindow
     private void OnConnectButtonClicked()
     {
         ModelManager.Instance.Get<LoginModel>().Login("xbb", "123456", "sample");
-        // txtTip.text = "start connect";
+        txtTip.text = "start connect";
     }
 
     private void OnBackButtonClicked()
@@ -54,12 +54,14 @@ public class UINetworkWindow : UIWindow
 
     private void OnLoginFailure(string errMessage)
     {
-        // txtTip.text = "login failure: " + errMessage;
+        txtTip.text = "login failure: " + errMessage;
     }
 
     private void OnLoginSuccess(int subid)
     {
-        Debug.Log("login success: " + subid);
-        // txtTip.text = "login sucess: " + subid;
+        Debug.Log("login success, subid: " + subid);
+        txtTip.text = "login sucess: " + subid;
+
+        // ModelManager.Instance.Get<LoginModel>().Login();
     }
 }
