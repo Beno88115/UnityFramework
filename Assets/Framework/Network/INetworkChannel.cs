@@ -127,6 +127,12 @@ namespace GameFramework.Network
         void SetDefaultHandler(EventHandler<Packet> handler);
 
         /// <summary>
+        /// 为NetworkChannel设置已经处于连接状态的Socket。
+        /// </summary>
+        /// <param name="handler">要设置的默认事件处理函数。</param>
+        void AttachActiveSocket(Socket socket);
+
+        /// <summary>
         /// 连接到远程主机。
         /// </summary>
         /// <param name="ipAddress">远程主机的 IP 地址。</param>

@@ -2,3 +2,6 @@
 *.csproj
 Excel2Json/localization
 Excel2Json/csharp
+Library/
+Temp/
+obj/

@@ -26,6 +26,7 @@ public class LoginModel : ModelBase
     private string m_UserName = null;
     private string m_UserPwd = null;
     private string m_ServerName = null;
+    private string m_SubID = null;
 
     Queue<ThreadEvent> m_ThreadEvents = null;
 
@@ -47,6 +48,9 @@ public class LoginModel : ModelBase
     {
     }
 
+    /// <summary>
+    /// 连接登录服务器，并进行登录操作。
+    /// </summary>
     public void Login(string userName, string userPwd, string serverName)
     {
         if (m_Socket != null) {
@@ -58,12 +62,17 @@ public class LoginModel : ModelBase
         m_UserPwd = userPwd;
         m_ServerName = serverName;
 
+        ConnectLoginServer();
+    }
+
+    private void ConnectLoginServer()
+    {
         try {
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             int port = 8001;
 
             m_Socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            m_Socket.BeginConnect(ipAddress, port, OnConnectCallback, null);
+            m_Socket.BeginConnect(ipAddress, port, OnConnectLoginServerCallback, null);
         }
         catch (Exception ex) {
             Debug.LogError(ex.Message);
@@ -75,7 +84,7 @@ public class LoginModel : ModelBase
         }
     }
 
-    private void OnConnectCallback(IAsyncResult ar)
+    private void OnConnectLoginServerCallback(IAsyncResult ar)
     {
         try {
             m_Socket.EndConnect(ar);
@@ -92,8 +101,6 @@ public class LoginModel : ModelBase
             return;
         }
 
-        Debug.Log(m_Socket.RemoteEndPoint.Serialize().Family);
-
         RunOnMainThread((ud)=>{
             if (NetworkConnected != null) {
                 NetworkConnected();
@@ -105,26 +112,28 @@ public class LoginModel : ModelBase
     private void Authenticate()
     {
         try {
-            byte[] challenge = Utility.Crypt.Base64Decode(ReceiveData());
+            byte[] challenge = Utility.Crypt.Base64Decode(ReceiveLine());
 
             byte[] clientKey = Utility.Crypt.RandomKey();
-            SendData(Utility.Crypt.Base64Encode(Utility.Crypt.DHExchange(clientKey)));
+            SendLine(Utility.Crypt.Base64Encode(Utility.Crypt.DHExchange(clientKey)));
 
-            byte[] serverKey = Utility.Crypt.Base64Decode(ReceiveData());
+            byte[] serverKey = Utility.Crypt.Base64Decode(ReceiveLine());
             ulong secret = Utility.Crypt.DHSecret(serverKey, clientKey);
 
             ulong hmac = Utility.Crypt.HMac64(challenge, secret);
-            SendData(Utility.Crypt.Base64Encode(hmac));
+            SendLine(Utility.Crypt.Base64Encode(hmac));
 
             string token = string.Format("{0}@{1}:{2}", Utility.Crypt.Base64Encode(m_UserName), Utility.Crypt.Base64Encode(m_ServerName), Utility.Crypt.Base64Encode(m_UserPwd));            
-            SendData(Utility.Crypt.Base64Encode(Utility.Crypt.DesEncode(secret, token)));
+            SendLine(Utility.Crypt.Base64Encode(Utility.Crypt.DesEncode(secret, token)));
 
             string result = string.Empty;
-            if (CheckResult(ReceiveData(), ref result)) {
-                if (LoginSuccess != null) {
-                    LoginSuccess(Convert.ToInt32(result));
-                }
+            if (CheckResult(ReceiveLine(), ref result)) {
                 AppConst.kSecret = secret;
+
+                // 登录服务器验证成功，断开连接后登录游戏服务器
+                RunOnMainThread((ud)=> {
+                    ConnectGameServer((string)ud);
+                }, result);
             }
             else {
                 if (LoginFailure != null) {
@@ -161,17 +170,98 @@ public class LoginModel : ModelBase
         return false;
     }
 
-    private string ReceiveData()
+    private void ConnectGameServer(string subid)
+    {
+        try {
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+            int port = 8888;
+
+            m_SubID = subid;
+            m_Socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            m_Socket.BeginConnect(ipAddress, port, OnConnectGameServerCallback, null);
+        }
+        catch (Exception ex) {
+            Debug.LogError(ex.Message);
+            Close();
+
+            if (NetworkConnecteFailure != null) {
+                NetworkConnecteFailure(ex.Message);
+            }
+        }
+    }
+
+    private void OnConnectGameServerCallback(IAsyncResult ar)
+    {
+        try {
+            m_Socket.EndConnect(ar);
+        }
+        catch (Exception ex) {
+            Debug.LogError(ex.Message);
+            Close();
+
+            RunOnMainThread((ud)=>{
+                if (NetworkConnecteFailure != null) {
+                    NetworkConnecteFailure((string)ud);
+                }
+            }, ex.Message);
+            return;
+        }
+
+        RunOnMainThread((ud)=>{
+            if (NetworkConnected != null) {
+                NetworkConnected();
+            }
+            LoginGameServer();
+        });
+    }
+
+    private void LoginGameServer()
+    {
+        string token = string.Format("{0}@{1}#{2}:{3}",  Utility.Crypt.Base64Encode(m_UserName), Utility.Crypt.Base64Encode(m_ServerName), Utility.Crypt.Base64Encode(m_SubID), 1);
+        ulong hmac = Utility.Crypt.HMac64(Utility.Crypt.HashKey(token), AppConst.kSecret);
+        SendData(token + ":" + Utility.Crypt.Base64Encode(hmac));
+
+        string result = ReceiveData();
+        Debug.Log("================result: " + result);
+    }
+
+    private string ReceiveLine()
     {
         byte[] buffer = new byte[1024];
         int len = m_Socket.Receive(buffer);
         return System.Text.Encoding.UTF8.GetString(buffer, 0, len).Replace("\n", "");
     }
 
-    private void SendData(string data)
+    private string ReceiveData()
+    {
+        byte[] buffer = new byte[1024];
+        m_Socket.Receive(buffer);
+
+        byte[] bytes = new byte[2];
+        bytes[0] = buffer[0];
+        bytes[1] = buffer[1];
+        Array.Reverse(bytes);
+
+        return System.Text.Encoding.UTF8.GetString(buffer, 2, (int)BitConverter.ToUInt16(bytes, 0));
+    }
+
+    private void SendLine(string data)
     {
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(data + "\n");
         m_Socket.Send(bytes);
+    }
+
+    private void SendData(string data)
+    {
+        byte[] content = System.Text.Encoding.UTF8.GetBytes(data);
+        byte[] header = BitConverter.GetBytes((ushort)content.Length);
+        Array.Reverse(header);
+
+        List<byte> buffers = new List<byte>();
+        buffers.AddRange(header);
+        buffers.AddRange(content);
+
+        m_Socket.Send(buffers.ToArray());
     }
 
     private void Close()
