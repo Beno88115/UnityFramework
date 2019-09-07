@@ -4,14 +4,11 @@ using GameFramework;
 using GameFramework.Resource;
 using GameFramework.Download;
 using GameFramework.ObjectPool;
-using System.Collections;
 using System.Collections.Generic;
 
 public partial class ResourceManager : SingletonMono<ResourceManager> 
 {
     private IResourceModule m_ResModule;
-    private IObjectPoolModule m_ObjectPoolModule;
-    private IObjectPool<ResObject> m_ObjectPool;
     private Dictionary<string, List<LoadAssetCompleteCallback>> m_AssetBeingLoaded;
     private LoadAssetCallbacks m_LoadAssetCallbacks;
 
@@ -44,9 +41,6 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         for (int i = 0; i < AppConst.kResourceAgentCount; ++i) {
             this.m_ResModule.AddLoadResourceAgentHelper(new LoadResourceAgentHelper());
         }
-
-        // this.m_ObjectPoolModule = GameFrameworkEntry.GetModule<IObjectPoolModule>();
-        // this.m_ObjectPool = this.m_ObjectPoolModule.CreateSingleSpawnObjectPool<ResObject>("Res Object Pool");
     }
 
     public void InitResources()
@@ -54,45 +48,21 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         m_ResModule.InitResources();
     }
 
-    /// <summary>
-    /// 异步加载资源。
-    /// </summary>
-    /// <param name="assetName">要加载资源的名称。</param>
-    /// <param name="LoadAssetSuccessCallback">加载资源成功回调函数。</param>
     public void LoadAsset(string assetName, LoadAssetCompleteCallback callback)
     {
         this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, null);
     }
 
-    /// <summary>
-    /// 异步加载资源。
-    /// </summary>
-    /// <param name="assetName">要加载资源的名称。</param>
-    /// <param name="assetType">要加载资源的类型。</param>
-    /// <param name="LoadAssetSuccessCallback">加载资源成功回调函数。</param>
     public void LoadAsset(string assetName, Type assetType, LoadAssetCompleteCallback callback)
     {
         this.LoadAsset(assetName, assetType, callback, null);
     }
 
-    /// <summary>
-    /// 异步加载资源。
-    /// </summary>
-    /// <param name="assetName">要加载资源的名称。</param>
-    /// <param name="LoadAssetSuccessCallback">加载资源成功回调函数。</param>
-    /// <param name="userData">用户自定义数据。</param>
     public void LoadAsset(string assetName, LoadAssetCompleteCallback callback, object userData)
     {
         this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, userData);
     }
 
-    /// <summary>
-    /// 异步加载资源。
-    /// </summary>
-    /// <param name="assetName">要加载资源的名称。</param>
-    /// <param name="assetType">要加载资源的类型。</param>
-    /// <param name="LoadAssetSuccessCallback">加载资源成功回调函数。</param>
-    /// <param name="userData">用户自定义数据。</param>
     public void LoadAsset(string assetName, Type assetType, LoadAssetCompleteCallback callback, object userData)
     {
         if (string.IsNullOrEmpty(assetName)) {

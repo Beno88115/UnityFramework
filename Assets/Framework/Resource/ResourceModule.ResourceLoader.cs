@@ -305,9 +305,19 @@ namespace GameFramework.Resource
                 if (m_ResourceModule.ResourceMode == ResourceMode.Simulation)
                 {
                     object asset = m_ResourceModule.m_ResourceSimulationHelper.LoadObject(assetName, resourceInfo.Value.ResourceName.FullName, assetType);
-                    if (loadAssetCallbacks.LoadAssetSuccessCallback != null)
+                    if (asset != null) 
                     {
-                        loadAssetCallbacks.LoadAssetSuccessCallback(assetName, asset, 0, userData);
+                        if (loadAssetCallbacks.LoadAssetSuccessCallback != null)
+                        {
+                            loadAssetCallbacks.LoadAssetSuccessCallback(assetName, asset, 0, userData);
+                        }
+                    }
+                    else
+                    {
+                        if (loadAssetCallbacks.LoadAssetFailureCallback != null)
+                        {
+                            loadAssetCallbacks.LoadAssetFailureCallback(assetName, LoadResourceStatus.NotExist, "not exist", userData);
+                        }
                     }
                 }
                 else

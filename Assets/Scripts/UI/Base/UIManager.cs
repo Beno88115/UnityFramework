@@ -102,47 +102,22 @@ public class UIManager : SingletonMono<UIManager>
         return false;
     }
 
-    public int PushWindow(string assetName)
+    public int PushWindow(string assetName, UIGroupType groupType = UIGroupType.UIWindow)
     {
-        return PushWindow(assetName, true, null);
+        return PushWindow(assetName, true, null, groupType);
     }
 
-    public int PushWindow(string assetName, bool pauseCoveredUIWindow)
+    public int PushWindow(string assetName, bool pauseCoveredUIWindow, UIGroupType groupType = UIGroupType.UIWindow)
     {
-        return PushWindow(assetName, pauseCoveredUIWindow, null);
+        return PushWindow(assetName, pauseCoveredUIWindow, null, groupType);
     }
 
-    public int PushWindow(string assetName, object userData)
+    public int PushWindow(string assetName, object userData, UIGroupType groupType = UIGroupType.UIWindow)
     {
-        return PushWindow(assetName, true, userData);
+        return PushWindow(assetName, true, userData, groupType);
     }
 
-    public int PushWindow(string assetName, bool pauseCoveredUIWindow, object userData)
-    {
-        return Push(assetName, UIGroupType.UIWindow, pauseCoveredUIWindow, userData);
-    }
-
-    public int PushDialog(string assetName)
-    {
-        return PushDialog(assetName, true, null);
-    }
-
-    public int PushDialog(string assetName, bool pauseCoveredUIWindow)
-    {
-        return PushDialog(assetName, pauseCoveredUIWindow, null);
-    }
-
-    public int PushDialog(string assetName, object userData)
-    {
-        return PushDialog(assetName, true, userData);
-    }
-
-    public int PushDialog(string assetName, bool pauseCoveredUIWindow, object userData)
-    {
-        return Push(assetName, UIGroupType.UIDialog, pauseCoveredUIWindow, userData);
-    }
-
-    private int Push(string assetName, UIGroupType groupType, bool pauseCoveredUIWindow, object userData)
+    private int PushWindow(string assetName, bool pauseCoveredUIWindow, object userData, UIGroupType groupType = UIGroupType.UIWindow)
     {
         return m_UIModule.OpenUIWindow(assetName, Utility.Enum.GetString<UIGroupType>(groupType), pauseCoveredUIWindow, userData);
     }
