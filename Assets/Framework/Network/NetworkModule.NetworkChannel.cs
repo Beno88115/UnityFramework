@@ -299,6 +299,62 @@ namespace GameFramework.Network
                 m_ReceivePacketPool.SetDefaultHandler(handler);
             }
 
+            public void AttachActiveSocket(Socket socket)
+            {
+                if (socket == null || !socket.Connected)
+                {
+                    throw new GameFrameworkException("Scoket is invalid");
+                }
+
+                switch (socket.AddressFamily)
+                {
+                    case AddressFamily.InterNetwork:
+                        m_NetworkType = NetworkType.IPv4;
+                        break;
+
+                    case AddressFamily.InterNetworkV6:
+                        m_NetworkType = NetworkType.IPv6;
+                        break;
+
+                    default:
+                        string errorMessage = Utility.Text.Format("Not supported address family '{0}'.", socket.AddressFamily.ToString());
+                        if (NetworkChannelError != null)
+                        {
+                            NetworkChannelError(this, NetworkErrorCode.AddressFamilyError, SocketError.Success, errorMessage);
+                            return;
+                        }
+                        throw new GameFrameworkException(errorMessage);
+                }
+
+                if (m_Socket != null)
+                {
+                    Close();
+                    m_Socket = null;
+                }
+                m_Socket = socket;
+
+                m_SendState.Reset();
+                m_ReceiveState.PrepareForPacketHeader(m_NetworkChannelHelper.PacketHeaderLength);
+
+                m_Active = true;
+
+                m_SentPacketCount = 0;
+                m_ReceivedPacketCount = 0;
+
+                lock (m_SendPacketPool)
+                {
+                    m_SendPacketPool.Clear();
+                }
+                m_ReceivePacketPool.Clear();
+
+                lock (m_HeartBeatState)
+                {
+                    m_HeartBeatState.Reset(true);
+                }
+
+                Receive();
+            }
+
             /// <summary>
             /// 连接到远程主机。
             /// </summary>
