@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Xml;
 
 namespace GameFramework.Resource
 {
@@ -76,106 +77,93 @@ namespace GameFramework.Resource
                     throw new GameFrameworkException(Utility.Text.Format("Package list '{0}' is invalid, error message is '{1}'.", fileUri, string.IsNullOrEmpty(errorMessage) ? "<Empty>" : errorMessage));
                 }
 
-                MemoryStream memoryStream = null;
-                try
+                try 
                 {
-                    memoryStream = new MemoryStream(bytes, false);
-                    using (BinaryReader binaryReader = new BinaryReader(memoryStream, Encoding.UTF8))
+                    string text = System.Text.Encoding.Default.GetString(bytes);
+                    UnityEngine.Debug.Log(text);
+                    XmlDocument xmlDocument = new XmlDocument();
+                    xmlDocument.LoadXml(text);
+                    // xmlDocument.Load(Path.Combine(UnityEngine.Application.streamingAssetsPath, "version.dat"));
+
+                    XmlElement root = (XmlElement)xmlDocument.SelectSingleNode("AssetBundles");
+                    m_ResourceModule.m_ApplicableGameVersion = root.GetAttribute("GameVersion"); 
+                    m_ResourceModule.m_InternalResourceVersion = int.Parse(root.GetAttribute("VersionCode"));
+
+                    int resourceCount = root.ChildNodes.Count;
+                    m_ResourceModule.m_ResourceInfos = new Dictionary<ResourceName, ResourceInfo>(resourceCount, new ResourceNameComparer());
+                    ResourceLength[] resourceLengths = new ResourceLength[resourceCount];
+
+                    for (int i = 0; i < resourceCount; i++)
                     {
-                        memoryStream = null;
-                        if (binaryReader.ReadChar() != PackageListHeader[0] || binaryReader.ReadChar() != PackageListHeader[1] || binaryReader.ReadChar() != PackageListHeader[2])
+                        XmlElement resourceElement = (XmlElement)root.ChildNodes[i];
+
+                        string name = resourceElement.GetAttribute("Name");
+                        string variant = resourceElement.GetAttribute("Variant");
+                        ResourceName resourceName = new ResourceName(name, variant);
+
+                        LoadType loadType = LoadType.LoadFromFile;
+                        int length = int.Parse(resourceElement.GetAttribute("Length"));
+                        int hashCode = int.Parse(resourceElement.GetAttribute("HashCode"));
+                        byte[] hashCodeBytes = new byte[4];
+                        Utility.Converter.GetBytes(hashCode, hashCodeBytes);
+                        resourceLengths[i] = new ResourceLength(resourceName, length, length);
+
+                        int assetNamesCount = resourceElement.ChildNodes.Count;
+                        for (int j = 0; j < assetNamesCount; j++)
                         {
-                            throw new GameFrameworkException("Package list header is invalid.");
-                        }
+                            XmlElement assetElement = (XmlElement)resourceElement.ChildNodes[j];
+                            string assetName = assetElement.GetAttribute("Name");
 
-                        byte listVersion = binaryReader.ReadByte();
-
-                        if (listVersion == 0)
-                        {
-                            byte[] encryptBytes = binaryReader.ReadBytes(4);
-
-                            m_ResourceModule.m_ApplicableGameVersion = m_ResourceModule.GetEncryptedString(binaryReader, encryptBytes);
-                            m_ResourceModule.m_InternalResourceVersion = binaryReader.ReadInt32();
-
-                            int assetCount = binaryReader.ReadInt32();
-                            m_ResourceModule.m_AssetInfos = new Dictionary<string, AssetInfo>(assetCount);
-                            int resourceCount = binaryReader.ReadInt32();
-                            m_ResourceModule.m_ResourceInfos = new Dictionary<ResourceName, ResourceInfo>(resourceCount, new ResourceNameComparer());
-                            ResourceLength[] resourceLengths = new ResourceLength[resourceCount];
-
-                            for (int i = 0; i < resourceCount; i++)
+                            int dependencyAssetNamesCount = assetElement.ChildNodes.Count;
+                            string[] dependencyAssetNames = new string[dependencyAssetNamesCount];
+                            for (int k = 0; k < dependencyAssetNamesCount; k++)
                             {
-                                string name = m_ResourceModule.GetEncryptedString(binaryReader, encryptBytes);
-                                string variant = m_ResourceModule.GetEncryptedString(binaryReader, encryptBytes);
-                                ResourceName resourceName = new ResourceName(name, variant);
-
-                                LoadType loadType = (LoadType)binaryReader.ReadByte();
-                                int length = binaryReader.ReadInt32();
-                                int hashCode = binaryReader.ReadInt32();
-                                byte[] hashCodeBytes = new byte[4];
-                                Utility.Converter.GetBytes(hashCode, hashCodeBytes);
-                                resourceLengths[i] = new ResourceLength(resourceName, length, length);
-
-                                int assetNamesCount = binaryReader.ReadInt32();
-                                for (int j = 0; j < assetNamesCount; j++)
-                                {
-                                    string assetName = m_ResourceModule.GetEncryptedString(binaryReader, hashCodeBytes);
-
-                                    int dependencyAssetNamesCount = binaryReader.ReadInt32();
-                                    string[] dependencyAssetNames = new string[dependencyAssetNamesCount];
-                                    for (int k = 0; k < dependencyAssetNamesCount; k++)
-                                    {
-                                        dependencyAssetNames[k] = m_ResourceModule.GetEncryptedString(binaryReader, hashCodeBytes);
-                                    }
-
-                                    if (variant == null || variant == m_CurrentVariant)
-                                    {
-                                        m_ResourceModule.m_AssetInfos.Add(assetName, new AssetInfo(assetName, resourceName, dependencyAssetNames));
-                                    }
-                                }
-
-                                if (variant == null || variant == m_CurrentVariant)
-                                {
-                                    ProcessResourceInfo(resourceName, loadType, length, hashCode);
-                                }
+                                XmlElement dependencyElement = (XmlElement)assetElement.ChildNodes[k];
+                                dependencyAssetNames[k] = dependencyElement.GetAttribute("Name");
                             }
 
-                            ResourceGroup defaultResourceGroup = m_ResourceModule.GetOrAddResourceGroup(string.Empty);
-                            for (int i = 0; i < resourceCount; i++)
+                            if (variant == null || variant == m_CurrentVariant)
                             {
-                                if (resourceLengths[i].ResourceName.Variant == null || resourceLengths[i].ResourceName.Variant == m_CurrentVariant)
-                                {
-                                    defaultResourceGroup.AddResource(resourceLengths[i].ResourceName, resourceLengths[i].Length, resourceLengths[i].ZipLength);
-                                }
-                            }
-
-                            int resourceGroupCount = binaryReader.ReadInt32();
-                            for (int i = 0; i < resourceGroupCount; i++)
-                            {
-                                string resourceGroupName = m_ResourceModule.GetEncryptedString(binaryReader, encryptBytes);
-                                ResourceGroup resourceGroup = m_ResourceModule.GetOrAddResourceGroup(resourceGroupName);
-                                int resourceGroupResourceCount = binaryReader.ReadInt32();
-                                for (int j = 0; j < resourceGroupResourceCount; j++)
-                                {
-                                    ushort index = binaryReader.ReadUInt16();
-                                    if (index >= resourceCount)
-                                    {
-                                        throw new GameFrameworkException(Utility.Text.Format("Package index '{0}' is invalid, resource count is '{1}'.", index.ToString(), resourceCount.ToString()));
-                                    }
-
-                                    if (resourceLengths[index].ResourceName.Variant == null || resourceLengths[index].ResourceName.Variant == m_CurrentVariant)
-                                    {
-                                        resourceGroup.AddResource(resourceLengths[index].ResourceName, resourceLengths[index].Length, resourceLengths[index].ZipLength);
-                                    }
-                                }
+                                m_ResourceModule.m_AssetInfos.Add(assetName, new AssetInfo(assetName, resourceName, dependencyAssetNames));
                             }
                         }
-                        else
+
+                        if (variant == null || variant == m_CurrentVariant)
                         {
-                            throw new GameFrameworkException("Package list version is invalid.");
+                            ProcessResourceInfo(resourceName, loadType, length, hashCode);
                         }
                     }
 
+                    ResourceGroup defaultResourceGroup = m_ResourceModule.GetOrAddResourceGroup(string.Empty);
+                    for (int i = 0; i < resourceCount; i++)
+                    {
+                        if (resourceLengths[i].ResourceName.Variant == null || resourceLengths[i].ResourceName.Variant == m_CurrentVariant)
+                        {
+                            defaultResourceGroup.AddResource(resourceLengths[i].ResourceName, resourceLengths[i].Length, resourceLengths[i].ZipLength);
+                        }
+                    }
+
+                    // int resourceGroupCount = binaryReader.ReadInt32();
+                    // for (int i = 0; i < resourceGroupCount; i++)
+                    // {
+                    //     string resourceGroupName = m_ResourceModule.GetEncryptedString(binaryReader, encryptBytes);
+                    //     ResourceGroup resourceGroup = m_ResourceModule.GetOrAddResourceGroup(resourceGroupName);
+                    //     int resourceGroupResourceCount = binaryReader.ReadInt32();
+                    //     for (int j = 0; j < resourceGroupResourceCount; j++)
+                    //     {
+                    //         ushort index = binaryReader.ReadUInt16();
+                    //         if (index >= resourceCount)
+                    //         {
+                    //             throw new GameFrameworkException(Utility.Text.Format("Package index '{0}' is invalid, resource count is '{1}'.", index.ToString(), resourceCount.ToString()));
+                    //         }
+
+                    //         if (resourceLengths[index].ResourceName.Variant == null || resourceLengths[index].ResourceName.Variant == m_CurrentVariant)
+                    //         {
+                    //             resourceGroup.AddResource(resourceLengths[index].ResourceName, resourceLengths[index].Length, resourceLengths[index].ZipLength);
+                    //         }
+                    //     }
+                    // }
+                    
                     ResourceInitComplete();
                 }
                 catch (Exception exception)
@@ -184,16 +172,7 @@ namespace GameFramework.Resource
                     {
                         throw;
                     }
-
                     throw new GameFrameworkException(Utility.Text.Format("Parse package list exception '{0}'.", exception.Message), exception);
-                }
-                finally
-                {
-                    if (memoryStream != null)
-                    {
-                        memoryStream.Dispose();
-                        memoryStream = null;
-                    }
                 }
             }
 

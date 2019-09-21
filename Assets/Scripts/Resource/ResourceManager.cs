@@ -31,7 +31,7 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
         this.m_ResModule.SetReadOnlyPath(Application.streamingAssetsPath);
         this.m_ResModule.SetReadWritePath(Application.persistentDataPath);
-        this.m_ResModule.SetResourceMode(ResourceMode.Simulation);
+        this.m_ResModule.SetResourceMode(ResourceMode.Package);
 
         this.m_ResModule.ResourceUpdateStart += OnResourceUpdateStart;
         this.m_ResModule.ResourceUpdateChanged += OnResourceUpdateChanged;
@@ -45,7 +45,9 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
     public void InitResources()
     {
-        m_ResModule.InitResources();
+        m_ResModule.InitResources(()=>{
+            
+        });
     }
 
     public void LoadAsset(string assetName, LoadAssetCompleteCallback callback)

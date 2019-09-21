@@ -58,8 +58,7 @@ public class UIManager : SingletonMono<UIManager>
 
     private void InitGroups()
     {
-        for (int i = (int)UIGroupType.UIWindow; i < (int)UIGroupType.Count; ++i) 
-        {
+        for (int i = (int)UIGroupType.UIWindow; i < (int)UIGroupType.Count; ++i) {
             AddGroup(Utility.Enum.GetString<UIGroupType>((UIGroupType)i), i);
         }
     }
@@ -149,7 +148,7 @@ public class UIManager : SingletonMono<UIManager>
 
     private void OnOpenWindowFailure(object sender, OpenUIWindowFailureEventArgs e)
     {
-        Debug.LogFormat("OnOpenWindowFailure[{0}]", e.UIWindowAssetName);
+        Debug.LogError(e.ErrorMessage);
     }
 
     private void OnOpenWindowUpdate(object sender, OpenUIWindowUpdateEventArgs e)
