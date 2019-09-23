@@ -61,7 +61,8 @@ namespace GameFramework.Resource
                     throw new GameFrameworkException("Readonly path is invalid.");
                 }
 
-                m_ResourceModule.m_ResourceHelper.LoadBytes(Utility.Path.GetRemotePath(m_ResourceModule.m_ReadOnlyPath, Utility.Path.GetResourceNameWithSuffix(VersionListFileName)), ParsePackageList);
+                // m_ResourceModule.m_ResourceHelper.LoadBytes(Utility.Path.GetRemotePath(m_ResourceModule.m_ReadOnlyPath, Utility.Path.GetResourceNameWithSuffix(VersionListFileName)), ParsePackageList);
+                m_ResourceModule.m_ResourceHelper.LoadBytes(Path.Combine(m_ResourceModule.m_ReadOnlyPath, Utility.Path.GetResourceNameWithSuffix(VersionListFileName)), ParsePackageList);
             }
 
             /// <summary>
@@ -80,10 +81,8 @@ namespace GameFramework.Resource
                 try 
                 {
                     string text = System.Text.Encoding.Default.GetString(bytes);
-                    UnityEngine.Debug.Log(text);
                     XmlDocument xmlDocument = new XmlDocument();
                     xmlDocument.LoadXml(text);
-                    // xmlDocument.Load(Path.Combine(UnityEngine.Application.streamingAssetsPath, "version.dat"));
 
                     XmlElement root = (XmlElement)xmlDocument.SelectSingleNode("AssetBundles");
                     m_ResourceModule.m_ApplicableGameVersion = root.GetAttribute("GameVersion"); 

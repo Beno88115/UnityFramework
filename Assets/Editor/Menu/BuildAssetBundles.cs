@@ -99,7 +99,7 @@ public static class BuildAssetBundles
 		
 		root.SetAttribute("AssetCount", totalAssetCount.ToString());
 		
-		string filePath = Path.Combine(outputPath, "version.dat");
+		string filePath = Path.Combine(outputPath, "version");
 		document.Save(filePath);
 
 		CopyAssetBundlesTo(Application.streamingAssetsPath);

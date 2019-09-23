@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
+namespace GameFramework
+{
 public static partial class Utility
 {
     public static class Enum
@@ -122,4 +124,5 @@ public static partial class Utility
             }
         }
     }
+}
 }

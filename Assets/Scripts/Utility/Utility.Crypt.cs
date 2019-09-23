@@ -1,5 +1,7 @@
 ﻿using System;
 
+namespace GameFramework
+{
 public static partial class Utility
 {
     public static class Crypt
@@ -770,4 +772,5 @@ public static partial class Utility
             }
         }
     }
+}
 }

@@ -1,5 +1,7 @@
 ﻿using System.Text;
 
+namespace GameFramework
+{
 public static partial class Utility 
 {
     public class File
@@ -34,4 +36,5 @@ public static partial class Utility
             return System.IO.File.ReadAllBytes(filePath);
         }
     }
+}
 }

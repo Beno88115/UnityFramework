@@ -39,7 +39,7 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         this.m_ResModule.ResourceUpdateFailure += OnResourceUpdateFailure;
 
         for (int i = 0; i < AppConst.kResourceAgentCount; ++i) {
-            this.m_ResModule.AddLoadResourceAgentHelper(new LoadResourceAgentHelper());
+            this.m_ResModule.AddLoadResourceAgentHelper(gameObject.AddComponent<LoadResourceAgentHelper>());
         }
     }
 

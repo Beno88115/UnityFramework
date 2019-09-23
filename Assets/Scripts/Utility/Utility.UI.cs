@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+namespace GameFramework
+{
 public static partial class Utility
 {
     public static class UI
@@ -61,4 +63,5 @@ public static partial class Utility
             return ui;
         }
     }
+}
 }

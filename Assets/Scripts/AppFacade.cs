@@ -10,10 +10,8 @@ public class AppFacade : SingletonMono<AppFacade>
         Debug.unityLogger.logEnabled = AppConst.kLogEnabled;
         if (AppConst.kLogMessageReceived)
             Application.logMessageReceived += OnLogMessage;
-
-#if UNITY_5_6_OR_NEWER
+        
         Application.lowMemory += OnLowMemory;
-#endif
     }
 
     public void Initialize()
@@ -41,10 +39,7 @@ public class AppFacade : SingletonMono<AppFacade>
         if (AppConst.kLogMessageReceived) 
             Application.logMessageReceived -= OnLogMessage;
 
-#if UNITY_5_6_OR_NEWER
         Application.lowMemory -= OnLowMemory;
-#endif
-
         GameFrameworkEntry.Shutdown();
     }
     
