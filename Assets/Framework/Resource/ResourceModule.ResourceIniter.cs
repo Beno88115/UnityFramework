@@ -89,6 +89,8 @@ namespace GameFramework.Resource
                     m_ResourceModule.m_ApplicableGameVersion = root.GetAttribute("GameVersion"); 
                     m_ResourceModule.m_InternalResourceVersion = int.Parse(root.GetAttribute("VersionCode"));
 
+                    int assetCount = int.Parse(root.GetAttribute("AssetCount"));
+                    m_ResourceModule.m_AssetInfos = new Dictionary<string, AssetInfo>(assetCount);
                     int resourceCount = root.ChildNodes.Count;
                     m_ResourceModule.m_ResourceInfos = new Dictionary<ResourceName, ResourceInfo>(resourceCount, new ResourceNameComparer());
                     ResourceLength[] resourceLengths = new ResourceLength[resourceCount];
@@ -122,13 +124,13 @@ namespace GameFramework.Resource
                                 dependencyAssetNames[k] = dependencyElement.GetAttribute("Name");
                             }
 
-                            if (variant == null || variant == m_CurrentVariant)
+                            if (string.IsNullOrEmpty(variant) || variant == m_CurrentVariant)
                             {
                                 m_ResourceModule.m_AssetInfos.Add(assetName, new AssetInfo(assetName, resourceName, dependencyAssetNames));
                             }
                         }
 
-                        if (variant == null || variant == m_CurrentVariant)
+                        if (string.IsNullOrEmpty(variant) || variant == m_CurrentVariant)
                         {
                             ProcessResourceInfo(resourceName, loadType, length, hashCode);
                         }

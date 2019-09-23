@@ -5,3 +5,8 @@ Excel2Json/csharp
 Library/
 Temp/
 obj/
+Assets/StreamingAssets/
+AssetBundles/
+Assets/StreamingAssets.meta
+.vs/
+.vscode/

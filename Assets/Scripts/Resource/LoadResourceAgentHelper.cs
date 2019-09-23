@@ -1,16 +1,37 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using GameFramework.Resource;
 
-public class LoadResourceAgentHelper : ILoadResourceAgentHelper 
+public class LoadResourceAgentHelper : MonoBehaviour, ILoadResourceAgentHelper
 {
+    private string m_FileFullPath = null;
+    private string m_BytesFullPath = null;
+    private int m_LoadType = 0;
+    private string m_AssetName = null;
+    private float m_LastProgress = 0f;
+    private bool m_Disposed = false;
+
+    private UnityWebRequest m_UnityWebRequest = null;
+    private AssetBundleCreateRequest m_FileAssetBundleCreateRequest = null;
+    private AssetBundleCreateRequest m_BytesAssetBundleCreateRequest = null;
+    private AssetBundleRequest m_AssetBundleRequest = null;
+    private AsyncOperation m_AsyncOperation = null;
+
+    private EventHandler<LoadResourceAgentHelperUpdateEventArgs> m_LoadResourceAgentHelperUpdateEventHandler = null;
+    private EventHandler<LoadResourceAgentHelperReadFileCompleteEventArgs> m_LoadResourceAgentHelperReadFileCompleteEventHandler = null;
+    private EventHandler<LoadResourceAgentHelperReadBytesCompleteEventArgs> m_LoadResourceAgentHelperReadBytesCompleteEventHandler = null;
+    private EventHandler<LoadResourceAgentHelperParseBytesCompleteEventArgs> m_LoadResourceAgentHelperParseBytesCompleteEventHandler = null;
+    private EventHandler<LoadResourceAgentHelperLoadCompleteEventArgs> m_LoadResourceAgentHelperLoadCompleteEventHandler = null;
+    private EventHandler<LoadResourceAgentHelperErrorEventArgs> m_LoadResourceAgentHelperErrorEventHandler = null;
+
     /// <summary>
     /// 加载资源代理辅助器异步加载资源更新事件。
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperUpdateEventArgs> LoadResourceAgentHelperUpdate
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperUpdateEventHandler += value; }
+        remove { m_LoadResourceAgentHelperUpdateEventHandler -= value; }
     }
 
     /// <summary>
@@ -18,8 +39,8 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperReadFileCompleteEventArgs> LoadResourceAgentHelperReadFileComplete
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperReadFileCompleteEventHandler += value; }
+        remove { m_LoadResourceAgentHelperReadFileCompleteEventHandler -= value; }
     }
 
     /// <summary>
@@ -27,8 +48,8 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperReadBytesCompleteEventArgs> LoadResourceAgentHelperReadBytesComplete
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperReadBytesCompleteEventHandler += value; }
+        remove { m_LoadResourceAgentHelperReadBytesCompleteEventHandler -= value; }
     }
 
     /// <summary>
@@ -36,8 +57,8 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperParseBytesCompleteEventArgs> LoadResourceAgentHelperParseBytesComplete
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperParseBytesCompleteEventHandler += value; }
+        remove { m_LoadResourceAgentHelperParseBytesCompleteEventHandler -= value; }
     }
 
     /// <summary>
@@ -45,8 +66,8 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperLoadCompleteEventArgs> LoadResourceAgentHelperLoadComplete
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperLoadCompleteEventHandler += value; }
+        remove { m_LoadResourceAgentHelperLoadCompleteEventHandler -= value; }
     }
 
     /// <summary>
@@ -54,8 +75,8 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public event EventHandler<LoadResourceAgentHelperErrorEventArgs> LoadResourceAgentHelperError
     {
-        add {}
-        remove {}
+        add { m_LoadResourceAgentHelperErrorEventHandler += value; }
+        remove { m_LoadResourceAgentHelperErrorEventHandler -= value; }
     }
 
     /// <summary>
@@ -65,6 +86,15 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     public void ReadFile(string fullPath)
     {
         Debug.Log("========read file:" + fullPath);
+        if (m_LoadResourceAgentHelperReadFileCompleteEventHandler == null 
+            || m_LoadResourceAgentHelperUpdateEventHandler == null 
+            || m_LoadResourceAgentHelperErrorEventHandler == null) {
+            Debug.LogError("Load resource agent helper handler is invalid.");
+            return;
+        }
+
+        m_FileFullPath = fullPath;
+        m_FileAssetBundleCreateRequest = AssetBundle.LoadFromFileAsync(m_FileFullPath);
     }
 
     /// <summary>
@@ -103,6 +133,21 @@ public class LoadResourceAgentHelper : ILoadResourceAgentHelper
     /// </summary>
     public void Reset()
     {
+        m_FileFullPath = null;
+        m_BytesFullPath = null;
+        m_LoadType = 0;
+        m_AssetName = null;
+        m_LastProgress = 0f;
 
+        if (m_UnityWebRequest != null)
+        {
+            m_UnityWebRequest.Dispose();
+            m_UnityWebRequest = null;
+        }
+
+        m_FileAssetBundleCreateRequest = null;
+        m_BytesAssetBundleCreateRequest = null;
+        m_AssetBundleRequest = null;
+        m_AsyncOperation = null;
     }
 }

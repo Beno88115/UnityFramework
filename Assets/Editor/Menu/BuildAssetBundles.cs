@@ -50,9 +50,9 @@ public static class BuildAssetBundles
 		root.SetAttribute("GameVersion", "1");
 		document.AppendChild(root);
 
+		int totalAssetCount = 0;
 		string[] assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
 		for (int i = 0; i < assetBundleNames.Length; ++i) {
-
 			string assetBundleName = assetBundleNames[i];
 			string[] assetPaths = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
 			if (assetPaths.Length == 0) {
@@ -90,10 +90,14 @@ public static class BuildAssetBundles
 						assetElement.AppendChild(dependencyAssetElement);
 					}
 				}
+
+				++totalAssetCount;
 			}
 
 			root.AppendChild(assetBundleElement);
 		}
+		
+		root.SetAttribute("AssetCount", totalAssetCount.ToString());
 		
 		string filePath = Path.Combine(outputPath, "version.dat");
 		document.Save(filePath);
