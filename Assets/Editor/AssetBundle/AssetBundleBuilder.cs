@@ -76,7 +76,7 @@ public class AssetBundleBuilder : EditorWindow
     private bool m_DeterministicAssetBundleSelected = false;
     private bool m_ForceRebuildAssetBundleSelected = false;
 
-    [MenuItem("Tools/AssetBundles/AssetBundleBuilder")]
+    [MenuItem("Tools/AssetBundles/AssetBundleBuilder", false, 1)]
     private static void Open()
     {
         var window = GetWindow<AssetBundleBuilder>(true, "AssetBundle Builder", true);

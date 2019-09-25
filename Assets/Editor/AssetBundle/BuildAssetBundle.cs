@@ -5,7 +5,7 @@ using System.Xml;
 
 public static class BuildAssetBundles 
 {
-    static readonly string kAssetBundleDirectory = "AssetBundles";
+    private const string kAssetBundleDirectory = "AssetBundles";
 
     [MenuItem("Tools/AssetBundles/Build AssetBundle/Windows")]
 	static void BuildAssetBundleForWindow()

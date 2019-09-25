@@ -853,7 +853,7 @@ namespace GameFramework.Resource
         /// <summary>
         /// 使用模拟模式并初始化资源。
         /// </summary>
-        public void InitResources()
+        public void InitSimulationResources()
         {
             if (m_ResourceMode != ResourceMode.Simulation)
             {

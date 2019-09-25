@@ -344,7 +344,7 @@ namespace GameFramework.Resource
         /// <summary>
         /// 使用模拟模式并初始化资源。
         /// </summary>
-        void InitResources();
+        void InitSimulationResources();
 
         /// <summary>
         /// 使用单机模式并初始化资源。

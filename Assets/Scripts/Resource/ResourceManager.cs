@@ -5,9 +5,17 @@ using GameFramework.Resource;
 using GameFramework.Download;
 using GameFramework.ObjectPool;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public partial class ResourceManager : SingletonMono<ResourceManager> 
 {
+#if UNITY_EDITOR
+    private const string kSimulateAssetBundle = "SIMULATE_ASSETBUNDLE";
+	private static int s_SimulateAssetBundleInEditor = -1;
+#endif
+
     private IResourceModule m_ResModule;
     private Dictionary<string, List<LoadAssetCompleteCallback>> m_AssetBeingLoaded;
     private LoadAssetCallbacks m_LoadAssetCallbacks;
@@ -31,7 +39,12 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
         this.m_ResModule.SetReadOnlyPath(Application.streamingAssetsPath);
         this.m_ResModule.SetReadWritePath(Application.persistentDataPath);
+
+#if UNITY_EDITOR
+        this.m_ResModule.SetResourceMode(SimulateAssetBundleInEditor ? ResourceMode.Simulation : ResourceMode.Package);
+#else
         this.m_ResModule.SetResourceMode(ResourceMode.Package);
+#endif
 
         this.m_ResModule.ResourceUpdateStart += OnResourceUpdateStart;
         this.m_ResModule.ResourceUpdateChanged += OnResourceUpdateChanged;
@@ -45,8 +58,14 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
     public void InitResources()
     {
+#if UNITY_EDITOR
+        if (SimulateAssetBundleInEditor) {
+            m_ResModule.InitSimulationResources();
+            return;
+        }
+#endif
         m_ResModule.InitResources(()=>{
-            
+            Debug.Log("load resource manifest succeed!");
         });
     }
 
@@ -153,4 +172,25 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
     { 
         get { return true; } 
     }
+
+#if UNITY_EDITOR
+	public static bool SimulateAssetBundleInEditor
+    {
+        get
+        {
+            if (s_SimulateAssetBundleInEditor == -1) {
+                s_SimulateAssetBundleInEditor = EditorPrefs.GetBool(kSimulateAssetBundle, true) ? 1 : 0;
+            }
+            return s_SimulateAssetBundleInEditor != 0;
+        }
+        set
+        {
+            int newValue = value ? 1 : 0;
+            if (newValue != s_SimulateAssetBundleInEditor) {
+                s_SimulateAssetBundleInEditor = newValue;
+                EditorPrefs.SetBool(kSimulateAssetBundle, value);
+            }
+        }
+    }
+#endif
 }
