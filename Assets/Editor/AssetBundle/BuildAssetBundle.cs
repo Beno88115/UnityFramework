@@ -133,7 +133,7 @@ public static class BuildAssetBundles
 
     public static string GetPlatformName(BuildTarget target)
 	{
-		return GetPlatformForAssetBundles(target);//EditorUserBuildSettings.activeBuildTarget);
+		return GetPlatformForAssetBundles(target);
 	}
 
 	private static string GetPlatformForAssetBundles(BuildTarget target)

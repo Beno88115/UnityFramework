@@ -2,10 +2,11 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using System.Xml;
 
 public class AssetBundleBuilder : EditorWindow 
 {
-    public enum Platform
+    enum Platform
     {
         Undefined = 0,
 
@@ -60,12 +61,11 @@ public class AssetBundleBuilder : EditorWindow
         WebGL = 1 << 9,
     }
 
+    private const string kDefaultAssetBundleDirectoryName = "AssetBundles";
+
     private int m_InternalResourceVersion = 0;
-    private string m_OutputDirectory = string.Empty;
-    private bool m_OutputPackageSelected = false;
+    private string m_OutputDirectory = null;
     private string m_OutputPackagePath = string.Empty;
-    private bool m_OutputFullSelected = false;
-    private string m_OutputFullPath = string.Empty;
     private bool m_OrderBuildAssetBundles = false;
     private Platform m_Platforms = Platform.Undefined;
     private bool m_UncompressedAssetBundleSelected = false;
@@ -80,16 +80,21 @@ public class AssetBundleBuilder : EditorWindow
     private static void Open()
     {
         var window = GetWindow<AssetBundleBuilder>(true, "AssetBundle Builder", true);
-        window.minSize = window.maxSize = new Vector2(700f, 570f);
+        window.minSize = window.maxSize = new Vector2(700f, 402f);
     }
 
     private void OnEnable() 
     {
+        LoadConfiguration();
+        m_OutputDirectory = m_OutputDirectory ?? Path.Combine(System.Environment.CurrentDirectory, kDefaultAssetBundleDirectoryName);
     }
     
     private void Update() 
     {
-        
+        if (m_OrderBuildAssetBundles) {
+            m_OrderBuildAssetBundles = false;
+            BuildAssetBundles();
+        }
     }
 
     private void OnGUI() 
@@ -243,21 +248,11 @@ public class AssetBundleBuilder : EditorWindow
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
                 {
-                    EditorGUI.BeginDisabledGroup(!m_OutputPackageSelected);
+                    m_OutputPackagePath = Path.Combine(m_OutputDirectory, Utility.Text.Format("{0}_{1}", Application.version.Replace(".", "_"), m_InternalResourceVersion));
                     EditorGUILayout.LabelField("Output Package Path", GUILayout.Width(160f));
                     GUILayout.Label(m_OutputPackagePath);
-                    EditorGUI.EndDisabledGroup();
-                    m_OutputPackageSelected = EditorGUILayout.ToggleLeft("Generate", m_OutputPackageSelected, GUILayout.Width(70f));
                 }
                 EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                {
-                    EditorGUI.BeginDisabledGroup(!m_OutputFullSelected);
-                    EditorGUILayout.LabelField("Output Full Path", GUILayout.Width(160f));
-                    GUILayout.Label(m_OutputFullPath);
-                    EditorGUI.EndDisabledGroup();
-                    m_OutputFullSelected = EditorGUILayout.ToggleLeft("Generate", m_OutputFullSelected, GUILayout.Width(70f));
-                }
                 EditorGUILayout.EndVertical();
                 GUILayout.Space(2f);
                 EditorGUILayout.BeginHorizontal();
@@ -272,7 +267,7 @@ public class AssetBundleBuilder : EditorWindow
                     EditorGUI.EndDisabledGroup();
                     if (GUILayout.Button("Save", GUILayout.Width(80f)))
                     {
-                        //SaveConfiguration();
+                        SaveConfiguration();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -297,5 +292,123 @@ public class AssetBundleBuilder : EditorWindow
         else {
             m_Platforms &= ~platform;
         }
+    }
+
+    private void LoadConfiguration()
+    {
+        try {
+            XmlDocument document = new XmlDocument();
+            document.Load(Path.Combine(System.Environment.CurrentDirectory, "AssetBundleBuilder.xml"));
+
+            XmlElement root = (XmlElement)document.SelectSingleNode("AssetBundleBuilder");
+            XmlElement element = (XmlElement)root.SelectSingleNode("Platforms");
+            if (element != null) {
+                m_Platforms = (Platform)int.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("InternalResourceVersion");
+            if (element != null) {
+                m_InternalResourceVersion = int.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("OutputDirectory");
+            if (element != null) {
+                m_OutputDirectory = element.InnerText;
+            }
+
+            element = (XmlElement)root.SelectSingleNode("UncompressedAssetBundleSelected");
+            if (element != null) {
+                m_UncompressedAssetBundleSelected = bool.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("ChunkBasedCompressionSelected");
+            if (element != null) {
+                m_ChunkBasedCompressionSelected = bool.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("DisableWriteTypeTreeSelected");
+            if (element != null) {
+                m_DisableWriteTypeTreeSelected = bool.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("IgnoreTypeTreeChangesSelected");
+            if (element != null) {
+                m_IgnoreTypeTreeChangesSelected = bool.Parse(element.InnerText);
+            }
+            
+            element = (XmlElement)root.SelectSingleNode("AppendHashToAssetBundleNameSelected");
+            if (element != null) {
+                m_AppendHashToAssetBundleNameSelected = bool.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("DeterministicAssetBundleSelected");
+            if (element != null) {
+                m_DeterministicAssetBundleSelected = bool.Parse(element.InnerText);
+            }
+
+            element = (XmlElement)root.SelectSingleNode("ForceRebuildAssetBundleSelected");
+            if (element != null) {
+                m_ForceRebuildAssetBundleSelected = bool.Parse(element.InnerText);
+            }
+        }
+        catch (System.Exception ex) {
+            Debug.LogError(ex);
+        }
+    }
+
+    private void SaveConfiguration()
+    {
+        XmlDocument document = new XmlDocument();
+		document.AppendChild(document.CreateXmlDeclaration("1.0", "UTF-8", null));
+
+        XmlElement root = document.CreateElement("AssetBundleBuilder");
+        document.AppendChild(root);
+
+        XmlElement element = document.CreateElement("Platforms");
+        element.InnerText = ((int)m_Platforms).ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("InternalResourceVersion");
+        element.InnerText = m_InternalResourceVersion.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("OutputDirectory");
+        element.InnerText = m_OutputDirectory;
+        root.AppendChild(element);
+
+        element = document.CreateElement("UncompressedAssetBundleSelected");
+        element.InnerText = m_UncompressedAssetBundleSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("ChunkBasedCompressionSelected");
+        element.InnerText = m_ChunkBasedCompressionSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("DisableWriteTypeTreeSelected");
+        element.InnerText = m_DisableWriteTypeTreeSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("IgnoreTypeTreeChangesSelected");
+        element.InnerText = m_IgnoreTypeTreeChangesSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("AppendHashToAssetBundleNameSelected");
+        element.InnerText = m_AppendHashToAssetBundleNameSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("DeterministicAssetBundleSelected");
+        element.InnerText = m_DeterministicAssetBundleSelected.ToString();
+        root.AppendChild(element);
+
+        element = document.CreateElement("ForceRebuildAssetBundleSelected");
+        element.InnerText = m_ForceRebuildAssetBundleSelected.ToString();
+        root.AppendChild(element);
+
+        document.Save(Path.Combine(System.Environment.CurrentDirectory, "AssetBundleBuilder.xml"));
+    }
+
+    private void BuildAssetBundles()
+    {
+        // TODO:
     }
 }
