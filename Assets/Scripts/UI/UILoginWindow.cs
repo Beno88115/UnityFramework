@@ -17,6 +17,8 @@ public class UILoginWindow : UIWindow
     Button btnNetwork;
     [SerializeField]
     Button btnCrypt;
+    [SerializeField]
+    Button btnLua;
 
     void Awake()
     {
@@ -27,6 +29,7 @@ public class UILoginWindow : UIWindow
         this.btnRes.onClick.AddListener(this.OnResButtonClicked);
         this.btnNetwork.onClick.AddListener(this.OnNetworkButtonClicked);
         this.btnCrypt.onClick.AddListener(this.OnCryptButtonClicked);
+        this.btnLua.onClick.AddListener(this.OnLuaButtonClicked);
     }
 
     private void OnLoginButtonClicked()
@@ -62,5 +65,10 @@ public class UILoginWindow : UIWindow
     private void OnCryptButtonClicked()
     {
         UIManager.Instance.PushWindow("UICrypt");
+    }
+
+    private void OnLuaButtonClicked()
+    {
+        UIManager.Instance.PushWindow("UILua");
     }
 }
