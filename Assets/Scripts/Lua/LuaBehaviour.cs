@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LuaInterface;
+using UnityEngine.UI;
 
 public class LuaBehaviour : MonoBehaviour
 {
     [SerializeField]
     private string m_LuaFile;
+    [SerializeField]
+    Button button;
 
     LuaState m_lua = null;
 
@@ -21,17 +24,21 @@ public class LuaBehaviour : MonoBehaviour
         m_lua.AddSearchPath(fullPath);
         m_lua.DoFile(m_LuaFile);
         
-        CallMethod("Awake", gameObject);
+        LuaTable table = m_lua.GetTable("table");
+        table["button"] = button;
+        
+        // CallMethod("Awake", gameObject, table);
+        CallMethod("Create", this);
     }
 
     void Start()
     {
-        CallMethod("Start");
+        CallMethod("Start", this);
     }
 
     void OnDestroy()
     {
-        CallMethod("OnDestroy");
+        CallMethod("OnDestroy", this);
     }
 
     void CallMethod(string methodName)
@@ -42,11 +49,24 @@ public class LuaBehaviour : MonoBehaviour
         }
     }
 
-    void CallMethod(string methodName, GameObject go)
+    void CallMethod(string methodName, LuaBehaviour go)
     {
         var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
         if (func != null) {
             func.Call(go);
         }
+    }
+
+    void CallMethod(string methodName, LuaBehaviour go, LuaTable lt)
+    {
+        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
+        if (func != null) {
+            func.Call(go, lt);
+        }
+    }
+
+    public void Add(int a, int b)
+    {
+        Debug.LogFormat("a: {0}, b: {1}", a, b);
     }
 }

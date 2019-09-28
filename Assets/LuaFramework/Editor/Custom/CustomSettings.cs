@@ -153,6 +153,7 @@ public static class CustomSettings
 
         _GT(typeof(UILuaWindow)),
         _GT(typeof(LuaBehaviour)),
+        _GT(typeof(LuaButton)),
     };
 
     public static List<Type> dynamicList = new List<Type>()
