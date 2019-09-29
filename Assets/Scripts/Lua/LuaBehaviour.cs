@@ -12,9 +12,11 @@ public class LuaBehaviour : MonoBehaviour
     Button button;
 
     LuaState m_lua = null;
+    LuaTable m_table = null;
 
     void Awake()
     {
+        new LuaResLoader();
         m_lua = new LuaState();
         m_lua.Start();
         LuaBinder.Bind(m_lua);
@@ -22,23 +24,24 @@ public class LuaBehaviour : MonoBehaviour
 
         string fullPath = Application.dataPath + "/LuaFramework/Lua/";
         m_lua.AddSearchPath(fullPath);
+        m_lua.DoFile("functions");
         m_lua.DoFile(m_LuaFile);
         
         LuaTable table = m_lua.GetTable("table");
         table["button"] = button;
         
         // CallMethod("Awake", gameObject, table);
-        CallMethod("Create", this);
+        CallMethod("Attach", this);
     }
 
     void Start()
     {
-        CallMethod("Start", this);
+        CallMethod("Start", m_table);
     }
 
     void OnDestroy()
     {
-        CallMethod("OnDestroy", this);
+        CallMethod("OnDestroy", m_table);
     }
 
     void CallMethod(string methodName)
@@ -46,6 +49,14 @@ public class LuaBehaviour : MonoBehaviour
         var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
         if (func != null) {
             func.Call();
+        }
+    }
+
+    void CallMethod(string methodName, LuaTable go)
+    {
+        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
+        if (func != null) {
+            func.Call(go);
         }
     }
 
@@ -57,7 +68,7 @@ public class LuaBehaviour : MonoBehaviour
         }
     }
 
-    void CallMethod(string methodName, LuaBehaviour go, LuaTable lt)
+    void CallMethod(string methodName, LuaTable go, LuaTable lt)
     {
         var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
         if (func != null) {
@@ -68,5 +79,10 @@ public class LuaBehaviour : MonoBehaviour
     public void Add(int a, int b)
     {
         Debug.LogFormat("a: {0}, b: {1}", a, b);
+    }
+
+    public void Attach(LuaTable table)
+    {
+        m_table = table;
     }
 }
