@@ -1,4 +1,6 @@
-local LuaBehaviour1 = class("LuaBehaviour1")
+
+local behaviour2 = require "LuaBehaviour2"
+local LuaBehaviour1 = component("LuaBehaviour1", behaviour2)
 
 -- 这个类只是用于测试，并没有存在的意义
 -- 提供一个DEMO

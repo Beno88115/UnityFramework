@@ -1,16 +1,19 @@
-local behaviour = require "LuaBehaviour1"
+local behaviour1 = require "LuaBehaviour1"
+local behaviour4 = require "LuaBehaviour4"
 local inspect = require "inspect"
+-- require "UITest2"
 
-UITest = class("UITest", behaviour)
+UITest = component("UITest", behaviour1)
+-- UITest = component("UITest", behaviour1, behaviour4)
 
 function UITest.Extend(cmpt)
-	extend(cmpt, UITest)
-	registerEventHandler(cmpt)
+	Helper.Extend(cmpt, UITest)
+	Helper.AddEventHandler(cmpt)
 end
 
 function UITest:Awake(widgets)
 	widgets.btnTitle:SetText("Title")
-	widgets.btnClose:AddClick(handler(self, UITest.OnCloseButtonClicked))
+	widgets.btnClose:AddClick(Helper.Handler(self, UITest.OnCloseButtonClicked))
 end
 
 -- function UITest:Start()
@@ -24,6 +27,9 @@ function UITest:OnEnable()
 
 	self:Sub(10, 30)
 	self:Add(10, 3000)
+	self:OnXYZ()
+	self:OnBattle()
+	-- self:OnXXZZZ()
 end
 
 function UITest:OnDisable()

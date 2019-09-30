@@ -1,15 +1,71 @@
-function class(classname, super)
+-- local inspect = require "inspect"
+
+function class(classname, ...)
 	local cls = { __cname = classname }
     cls.__index = cls
 
-    if super then
-        setmetatable(cls, super)
+    local supers = { ... }
+    for _, super in ipairs(supers) do
+        local superType = type(super)
+        if superType == "table" then
+            cls.__supers = cls.__supers or {}
+            cls.__supers[#cls.__supers + 1] = super
+            if not cls.super then
+                cls.super = super
+            end
+        end
+    end
 
-        -- cls.__super = super
-        -- setmetatable(cls, { __index = function(_, key) 
-        --     print("==========cls: " .. key)
-        --     if cls.__super[key] then
-        --         return cls.__super[key]
+    if not cls.__supers or #cls.__supers == 1 then
+        setmetatable(cls, {__index = cls.super})
+        -- setmetatable(cls, cls.super)
+    else
+        setmetatable(cls, {__index = function(_, key)
+            local supers = cls.__supers
+            for i = 1, #supers do
+                local super = supers[i]
+                if super[key] then return super[key] end
+            end
+        end})
+
+        -- setmetatable(cls, function(_, key)
+        --     local supers = cls.__supers
+        --     for i = 1, #supers do
+        --         local super = supers[i]
+        --         if super[key] then return super[key] end
+        --     end
+        -- end)
+    end
+    
+	return cls
+end
+
+function component(cmptname, ...)
+	local cls = { __cname = cmptname }
+    cls.__index = cls
+
+    local supers = { ... }
+    for _, super in ipairs(supers) do
+        local superType = type(super)
+        if superType == "table" then
+            cls.__supers = cls.__supers or {}
+            cls.__supers[#cls.__supers + 1] = super
+            if not cls.super then
+                cls.super = super
+            end
+        end
+    end
+
+    if not cls.__supers or #cls.__supers == 1 then
+        setmetatable(cls, cls.super)
+    else
+        -- TODO:
+        -- setmetatable(cls, { __index = function(_, key)
+        --     print("1111======================key: " .. key)
+        --     local supers = cls.__supers
+        --     for i = 1, #supers do
+        --         local super = supers[i]
+        --         if super[key] then return super[key] end
         --     end
         -- end })
     end
@@ -17,30 +73,7 @@ function class(classname, super)
 	return cls
 end
 
-function extend(cmpt, cls)
-    if type(cmpt) == "userdata" then
-		local peer = tolua.getpeer(cmpt)
-		if not peer then
-			tolua.setpeer(cmpt, cls)
-		end
-    end
-end
-
-function registerEventHandler(node)
-    local function onEvent(event, ...)
-        if event == "Awake" then
-            if node.Awake then node:Awake(...) end
-        elseif event == "Start" then
-            if node.Start then node:Start() end
-        elseif event == "OnDestroy" then
-            if node.OnDestroy then node:OnDestroy() end
-        elseif event == "OnEnable" then
-            if node.OnEnable then node:OnEnable() end
-        elseif event == "OnDisable" then
-            if node.OnDisable then node:OnDisable() end
-        end
-    end
-    node:RegisterEventHandler(onEvent)
+local function setmetatableindex(cls, index)
 end
 
 -- function class(classname, ...)
@@ -116,9 +149,3 @@ end
 
 --     return cls
 -- end
-
-function handler(obj, method)
-    return function(...)
-        return method(obj, ...)
-    end
-end

@@ -48,6 +48,7 @@ public class LuaBehaviour : MonoBehaviour
         string fullPath = Application.dataPath + "/LuaFramework/Lua/";
         m_lua.AddSearchPath(fullPath);
         m_lua.DoFile("functions");
+        m_lua.DoFile("Helper");
         // m_lua.DoFile("inspect");
         m_lua.DoFile(m_LuaFile);
         
