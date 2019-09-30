@@ -1,57 +1,33 @@
--- local LuaBehaviour = require "LuaBehaviour"
--- print(tostring(LuaBehaviour))
--- -- print("=========lua:" .. type(LuaBehaviour.Start))
--- dump(LuaBehaviour, "vvvv", 10)
--- LuaBehaviour:Awake()
+local behaviour = require "LuaBehaviour1"
+local inspect = require "inspect"
 
--- UITest = class("UITest", LuaBehaviour)
-UITest = {}
+UITest = class("UITest", behaviour)
 
-function UITest.Attach(cmpt)
-	-- LuaBehaviour.__index = LuaBehaviour
-
-	print("====type: " .. type(cmpt))
-	-- UITest.__index = UITest
-	UITest.__super = cmpt
-	setmetatable(UITest, { __index = function(_, key)
-		-- print("=========vvv: " .. vv)
-		local super = UITest.__super
-		if super[key] then
-			-- local typeName = type(super)
-			-- if typeName == "userdata" then
-
-            -- end
-			return super[key]
-        end
-	end })
-
-	cmpt:Attach(UITest)
-	-- LuaBehaviour:Add(10, 20)
-	-- t.Awake(component, component.gameObject, ...)
+function UITest.Extend(cmpt)
+	extend(cmpt, UITest)
+	registerEventHandler(cmpt)
 end
 
-function UITest:Awake()
-	-- attach(obj, UITest)
-	-- print("=======awake:" .. self.name)
-
-	-- local component = gameObject.transform:GetComponent("LuaBehaviour")
-	-- component:AddClick(btn, this.OnCloseButtonClicked)
-
-	-- print("==========binder: " .. binders.button)
-
-	-- binders.button:AddClick(UITest.OnCloseButtonClicked)
+function UITest:Awake(widgets)
+	widgets.btnTitle:SetText("Title")
+	widgets.btnClose:AddClick(handler(self, UITest.OnCloseButtonClicked))
 end
 
-function UITest:Start()
-	print("=========start:" .. self.name)
+-- function UITest:Start()
+-- 	self:Sub(10, 30)
+-- 	self:Add(10, 300)
+-- 	self:OnXXX()
+-- end
 
-	-- binders.button:AddClick(handler(self, UITest.OnCloseButtonClicked))
+function UITest:OnEnable()
+	print("============onenable")
 
 	self:Sub(10, 30)
-	-- self.Add(UITest.__super, 10, 30)
-	self:Add(10, 300)
-	-- self.__super:Add(110, 30)
-	-- self.cmpt:Add(110, 30)
+	self:Add(10, 3000)
+end
+
+function UITest:OnDisable()
+	print("==============ondisable")
 end
 
 function UITest:OnDestroy()
@@ -63,9 +39,5 @@ function UITest:OnCloseButtonClicked()
 end
 
 function UITest:Sub(a, b)
-	print("========sub")
-end
-
-UITest.Add = function(obj, ...)
-	return UITest.__super:Add(...)
+	print("========sub:")
 end
