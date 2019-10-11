@@ -14,7 +14,6 @@ public partial class LuaBehaviour : MonoBehaviour
     {
         InitializeComponentInfos();
 
-        // LuaManager.Instance.Initialize();
         LuaManager.Instance.DoFile(m_LuaFile);
 
         Call("Extend", this);

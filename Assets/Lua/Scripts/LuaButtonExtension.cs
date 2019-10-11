@@ -1,0 +1,19 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using LuaInterface;
+
+public static class LuaButtonExtension 
+{
+    public static void AddClick2(this Button button, LuaFunction function)
+    {
+        if (function == null) {
+            return;
+        }
+
+        button.onClick.AddListener(()=>{
+            function.Call();
+        });
+    }
+}

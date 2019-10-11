@@ -14,6 +14,8 @@ end
 
 function UILuaWindow:Start()
 	print("==============start: " .. self.name)
+	print("==============go:" .. tostring(self.gameObject))
+	self.gameObject:GetLuaComponent("xxxx")
 end
 
 function UILuaWindow:OnEnable()
@@ -49,4 +51,9 @@ function UILuaWindow:OnLua2ButtonClicked()
 	userData.tip = "TIP22222"
 	userData.tip2 = "XBB3333"
 	UIManager.Instance:PushWindow("UILua2", userData)
+
+	local xxx = GameObject.Instance(prefab)
+	-- local c = xxx.GetComponent("LuaBehaviour")
+	-- local lc = c.GetLuaCompnent('')
+	local lc2 = xxx.GetLuaComponent("")
 end

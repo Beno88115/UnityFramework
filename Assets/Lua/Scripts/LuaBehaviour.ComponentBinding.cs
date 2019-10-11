@@ -10,6 +10,7 @@ public partial class LuaBehaviour : MonoBehaviour
         BUTTON,
         TEXT,
         TEXT2,
+        BUTTON2,
     }
 
     [Serializable]
@@ -25,6 +26,7 @@ public partial class LuaBehaviour : MonoBehaviour
     private void InitializeComponentInfos()
     {
         m_Types.Add(ComponentType.BUTTON, typeof(LuaButton));
+        m_Types.Add(ComponentType.BUTTON2, typeof(UnityEngine.UI.Button));
         m_Types.Add(ComponentType.TEXT, typeof(LuaText));
         m_Types.Add(ComponentType.TEXT2, typeof(UnityEngine.UI.Text));
         m_Types.Add(ComponentType.TRANSFORM, typeof(UnityEngine.Transform));
