@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class UIWindowHelper : IUIWindowHelper 
 {
-    private Dictionary<string, UIGroup> m_Groups = null;
+    protected Dictionary<string, UIGroup> m_Groups = null;
 
     public UIWindowHelper(Dictionary<string, UIGroup> groups)
     {
@@ -17,7 +17,7 @@ public class UIWindowHelper : IUIWindowHelper
     /// </summary>
     /// <param name="uiWindowAsset">要实例化的界面资源。</param>
     /// <returns>实例化后的界面。</returns>
-    public object InstantiateUIWindow(object uiWindowAsset)
+    public virtual object InstantiateUIWindow(object uiWindowAsset)
     {
         return UnityEngine.GameObject.Instantiate(uiWindowAsset as UnityEngine.Object);
     }
@@ -29,12 +29,11 @@ public class UIWindowHelper : IUIWindowHelper
     /// <param name="uiGroup">界面所属的界面组。</param>
     /// <param name="userData">用户自定义数据。</param>
     /// <returns>界面。</returns>
-    public IUIWindow CreateUIWindow(object uiWindowInstance, IUIGroup uiGroup, object userData)
+    public virtual IUIWindow CreateUIWindow(object uiWindowInstance, IUIGroup uiGroup, object userData)
     {
         var ui = uiWindowInstance as GameObject;
-        var window = ui.GetComponent<UIWindow>(); 
-        window.transform.SetParent(m_Groups[uiGroup.Name].transform, false);
-        return window;
+        ui.transform.SetParent(m_Groups[uiGroup.Name].transform, false);
+        return ui.GetComponent<IUIWindow>();
     }
 
     /// <summary>
@@ -42,7 +41,7 @@ public class UIWindowHelper : IUIWindowHelper
     /// </summary>
     /// <param name="uiWindowAsset">要释放的界面资源。</param>
     /// <param name="uiWindowInstance">要释放的界面实例。</param>
-    public void ReleaseUIWindow(object uiWindowAsset, object uiWindowInstance)
+    public virtual void ReleaseUIWindow(object uiWindowAsset, object uiWindowInstance)
     {
     }
 }

@@ -598,13 +598,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LuaFile: UITest
-  m_Widgets:
+  m_Components:
   - name: btnClose
-    widget: {fileID: 1234934292}
-    widgetType: 1
+    transform: {fileID: 1234934292}
+    type: 1
   - name: btnTitle
-    widget: {fileID: 210648085}
-    widgetType: 2
+    transform: {fileID: 210648085}
+    type: 2
 --- !u!4 &1620587336
 Transform:
   m_ObjectHideFlags: 0

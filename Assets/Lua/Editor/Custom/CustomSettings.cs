@@ -151,10 +151,12 @@ public static class CustomSettings
         _GT(typeof(Resources)),     
         _GT(typeof(LuaProfiler)),
 
-        _GT(typeof(UILuaWindow)),
         _GT(typeof(LuaBehaviour)),
         _GT(typeof(LuaButton)),
         _GT(typeof(LuaText)),
+        _GT(typeof(LuaWindow)),
+        _GT(typeof(UIManager)),
+        _GT(typeof(UIGroupType)),
     };
 
     public static List<Type> dynamicList = new List<Type>()

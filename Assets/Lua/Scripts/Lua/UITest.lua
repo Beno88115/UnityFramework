@@ -26,7 +26,6 @@ function UITest:OnEnable()
 	print("============onenable")
 
 	self:Sub(10, 30)
-	self:Add(10, 3000)
 	self:OnXYZ()
 	self:OnBattle()
 	-- self:OnXXZZZ()

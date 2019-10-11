@@ -1,143 +1,100 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using LuaInterface;
-using UnityEngine.UI;
-using System;
 
-public class LuaBehaviour : MonoBehaviour
+public partial class LuaBehaviour : MonoBehaviour
 {
-    [Serializable]
-    public class Widget
-    {
-        public string name;
-        public Transform widget;
-        public WidgetType widgetType;
-    }
-
-    public enum WidgetType
-    {
-        TRANSFORM,
-        BUTTON,
-        TEXT,
-    }
-
     [SerializeField]
-    private string m_LuaFile;
+    string m_LuaFile;
     [SerializeField]
-    Widget[] m_Widgets;
-    // [SerializeField]
-    // Button button;
+    ComponentBinding[] m_Components;
 
-    LuaState m_lua = null;
-    LuaFunction m_function = null;
-    Dictionary<WidgetType, Type> m_Types = new Dictionary<WidgetType, Type>();
+    protected LuaFunction m_LifeCycleFunction = null;
 
-    void Awake()
+    protected virtual void Awake()
     {
-        m_Types.Add(WidgetType.TRANSFORM, typeof(UnityEngine.Transform));
-        m_Types.Add(WidgetType.BUTTON, typeof(LuaButton));
-        m_Types.Add(WidgetType.TEXT, typeof(LuaText));
+        InitializeComponentInfos();
 
-        new LuaResLoader();
-        m_lua = new LuaState();
-        m_lua.Start();
-        LuaBinder.Bind(m_lua);
-        DelegateFactory.Init();
+        // LuaManager.Instance.Initialize();
+        LuaManager.Instance.DoFile(m_LuaFile);
 
-        m_lua.AddSearchPath(Application.dataPath + "/Lua/Scripts/Lua");
-        m_lua.DoFile("Core/Functions");
-        m_lua.DoFile("Core/Helper");
-        // m_lua.DoFile("inspect");
-        m_lua.DoFile(m_LuaFile);
-        
-        LuaTable table = m_lua.GetTable("table");
-        for (int i = 0; i < m_Widgets.Length; ++i) {
-            var widget = m_Widgets[i];
-            table[widget.name] = widget.widget.GetComponent(m_Types[widget.widgetType]);
-        }
-
-        CallMethod("Extend", this);
-        CallLifeMethod("Awake", this, table);
+        Call("Extend", this);
+        CallAwake();
     }
 
-    void Start()
+    protected virtual void Start()
     {
-        CallLifeMethod("Start", this);
+        CallLifecycle("Start");
     }
 
-    void OnDestroy()
+    protected virtual void OnEnable()
     {
-        CallLifeMethod("OnDestroy", this);
+        CallLifecycle("OnEnable");
     }
 
-    void OnEnable()
+    protected virtual void OnDisable()
     {
-        CallLifeMethod("OnEnable", this);
+        CallLifecycle("OnDisable");
     }
 
-    void OnDisable()
+    protected virtual void OnDestroy()
     {
-        CallLifeMethod("OnDisable", this);
+        CallLifecycle("OnDestroy");
     }
 
-    void CallMethod(string methodName)
+    protected void CallLifecycle(string functionName)
     {
-        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
-        if (func != null) {
-            func.Call();
+        if (m_LifeCycleFunction != null) {
+            m_LifeCycleFunction.Call(functionName);
         }
     }
 
-    void CallMethod(string methodName, LuaBehaviour go)
+    protected void CallLifecycle<T1>(string functionName, T1 arg1)
     {
-        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
-        if (func != null) {
-            func.Call(go);
+        if (m_LifeCycleFunction != null) {
+            m_LifeCycleFunction.Call(functionName, arg1);
         }
     }
 
-    void CallMethod(string methodName, LuaBehaviour go, LuaTable t)
+    protected void CallLifecycle<T1, T2>(string functionName, T1 arg1, T2 arg2)
     {
-        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
-        if (func != null) {
-            func.Call(go, t);
+        if (m_LifeCycleFunction != null) {
+            m_LifeCycleFunction.Call(functionName, arg1, arg2);
         }
     }
 
-    void CallMethod(string methodName, LuaTable go, LuaTable lt)
+    protected void Call<T1>(string functionName, T1 arg1)
     {
-        var func = m_lua.GetFunction(string.Format("{0}.{1}", m_LuaFile, methodName));
-        if (func != null) {
-            func.Call(go, lt);
+        LuaManager.Instance.CallFunction(string.Format("{0}.{1}", m_LuaFile, functionName), arg1);
+    }
+
+    private void CallAwake()
+    {
+        if (m_Components.Length > 0) {
+            LuaTable tt = LuaManager.Instance.GetTemporaryTable();
+            for (int i = 0; i < m_Components.Length; ++i) {
+                var cmpt = m_Components[i];
+                if (cmpt.transform != null && !string.IsNullOrEmpty(cmpt.name)) {
+                    tt[cmpt.name] = cmpt.transform.GetComponent(GetComponetType(cmpt.type));
+                }
+            }
+            CallLifecycle("Awake", tt);
+            LuaManager.Instance.ReleaseTemporaryTable(tt);
+        }
+        else {
+            CallLifecycle("Awake");
         }
     }
-
-    public void Add(int a, int b)
-    {
-        Debug.LogFormat("a: {0}, b: {1}", a, b);
-    }
-
-    public void RegisterEventHandler(LuaFunction function)
-    {
-        if (function != null && m_function != function) {
-            m_function = function;
-        }
-    }
-
-    void CallLifeMethod(string methodName, LuaBehaviour go)
-    {
-        if (m_function != null) {
-            m_function.Call(methodName);
-        }
-    }
-
-    void CallLifeMethod(string methodName, LuaBehaviour go, LuaTable table)
-    {
-        if (m_function != null) {
-            m_function.Call(methodName, table);
-        }
-    }
-
     
+    public void AddEventHandler(LuaFunction function)
+    {
+        if (function == null || m_LifeCycleFunction == function) {
+            return;
+        }
+
+        if (m_LifeCycleFunction != null) {
+            m_LifeCycleFunction.Dispose();
+            m_LifeCycleFunction = null;
+        }
+        m_LifeCycleFunction = function;
+    }
 }
