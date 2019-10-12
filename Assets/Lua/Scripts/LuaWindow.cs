@@ -5,18 +5,6 @@ using GameFramework.UI;
 [DisallowMultipleComponent]
 public class LuaWindow : LuaBehaviour, IUIWindow
 {
-    static readonly string ONINIT = "OnInit";
-    static readonly string ONOPEN = "OnOpen";
-    static readonly string ONRECYCLE = "OnRecycle";
-    static readonly string ONENABLE = "OnRecycle";
-    static readonly string ONDISABLE = "OnClose";
-    static readonly string ONPAUSE = "OnPause";
-    static readonly string ONRESUME = "OnResume";
-    static readonly string ONCOVER = "OnCover";
-    static readonly string ONREVEAL = "OnReveal";
-    static readonly string ONREFOCUS = "OnRefocus";
-    static readonly string ONCLOSE = "OnClose";
-
     /// <summary>
     /// 获取界面序列编号。
     /// </summary>
@@ -88,7 +76,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
         UIWindowAssetName = uiWindowAssetName;
         Handle = gameObject;
 
-        CallFunction(ONINIT, this, isNewInstance, (LuaTable)userData);
+        LuaHelper.CallFunction(LuaExtendHelper.ONINIT, isNewInstance, (LuaTable)userData);
     }
 
     /// <summary>
@@ -96,7 +84,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// </summary>
     public virtual void OnRecycle()
     {
-        CallFunction(ONRECYCLE, this);
+        LuaHelper.CallFunction(LuaExtendHelper.ONRECYCLE);
     }
 
     /// <summary>
@@ -105,7 +93,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// <param name="userData">用户自定义数据。</param>
     public virtual void OnOpen(object userData)
     {
-        CallFunction(ONOPEN, this, (LuaTable)userData);
+        LuaHelper.CallFunction(LuaExtendHelper.ONOPEN, (LuaTable)userData);
     }
 
     /// <summary>
@@ -114,7 +102,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// <param name="userData">用户自定义数据。</param>
     public virtual void OnClose(object userData)
     {
-        CallFunction(ONCLOSE, this, (LuaTable)userData);
+        LuaHelper.CallFunction(LuaExtendHelper.ONCLOSE, (LuaTable)userData);
     }
 
     /// <summary>
@@ -124,7 +112,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     {
         if (this != null) {
             ((RectTransform)transform).anchoredPosition = new Vector2(0, 5000);
-            CallFunction(ONPAUSE, this);
+            LuaHelper.CallFunction(LuaExtendHelper.ONPAUSE);
         }
     }
 
@@ -135,7 +123,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     {
         if (this != null) {
             ((RectTransform)transform).anchoredPosition = Vector2.zero;
-            CallFunction(ONRESUME, this);
+            LuaHelper.CallFunction(LuaExtendHelper.ONRESUME);
         }
     }
 
@@ -144,7 +132,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// </summary>
     public virtual void OnCover()
     {
-        CallFunction(ONCOVER, this);
+        LuaHelper.CallFunction(LuaExtendHelper.ONCOVER);
     }
 
     /// <summary>
@@ -152,7 +140,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// </summary>
     public virtual void OnReveal()
     {
-        CallFunction(ONREVEAL, this);
+        LuaHelper.CallFunction(LuaExtendHelper.ONREVEAL);
     }
 
     /// <summary>
@@ -161,7 +149,7 @@ public class LuaWindow : LuaBehaviour, IUIWindow
     /// <param name="userData">用户自定义数据。</param>
     public virtual void OnRefocus(object userData)
     {
-        CallFunction(ONREFOCUS, this, (LuaTable)userData);
+        LuaHelper.CallFunction(LuaExtendHelper.ONREFOCUS, (LuaTable)userData);
     }
 
     /// <summary>
