@@ -21,15 +21,17 @@ public partial class LuaBehaviour : MonoBehaviour
         public ComponentType type;
     }
 
-    private Dictionary<ComponentType, Type> m_Types = new Dictionary<ComponentType, Type>();
+    private static Dictionary<ComponentType, Type> m_Types = new Dictionary<ComponentType, Type>();
 
     private void InitializeComponentInfos()
     {
-        m_Types.Add(ComponentType.BUTTON, typeof(LuaButton));
-        m_Types.Add(ComponentType.BUTTON2, typeof(UnityEngine.UI.Button));
-        m_Types.Add(ComponentType.TEXT, typeof(LuaText));
-        m_Types.Add(ComponentType.TEXT2, typeof(UnityEngine.UI.Text));
-        m_Types.Add(ComponentType.TRANSFORM, typeof(UnityEngine.Transform));
+        if (m_Types.Count == 0) {
+            m_Types.Add(ComponentType.BUTTON, typeof(LuaButton));
+            m_Types.Add(ComponentType.BUTTON2, typeof(UnityEngine.UI.Button));
+            m_Types.Add(ComponentType.TEXT, typeof(LuaText));
+            m_Types.Add(ComponentType.TEXT2, typeof(UnityEngine.UI.Text));
+            m_Types.Add(ComponentType.TRANSFORM, typeof(UnityEngine.Transform));
+        }
     }
 
     private Type GetComponetType(ComponentType type)

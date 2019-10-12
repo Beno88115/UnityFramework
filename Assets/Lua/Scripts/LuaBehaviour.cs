@@ -3,97 +3,107 @@ using LuaInterface;
 
 public partial class LuaBehaviour : MonoBehaviour
 {
+    static readonly string AWAKE = "Awake";
+    static readonly string START = "Start";
+    static readonly string ONENABLE = "OnEnable";
+    static readonly string ONDISABLE = "OnDisable";
+    static readonly string ONDESTROY = "OnDestroy";
+
     [SerializeField]
     string m_LuaFile;
     [SerializeField]
     ComponentBinding[] m_Components;
 
-    protected LuaFunction m_LifeCycleFunction = null;
+    private LuaTable m_LuaTable = null;
+
+    public string LuaComponentName { get { return m_LuaFile; } }
 
     protected virtual void Awake()
     {
         InitializeComponentInfos();
 
-        LuaManager.Instance.DoFile(m_LuaFile);
+        RequireLuaComponent();
+        ExtendLuaComponent();
+        BindingComponentForLua();
 
-        Call("Extend", this);
-        CallAwake();
+        CallFunction(AWAKE, this);
     }
 
     protected virtual void Start()
     {
-        CallLifecycle("Start");
+        CallFunction(START, this);
     }
 
     protected virtual void OnEnable()
     {
-        CallLifecycle("OnEnable");
+        CallFunction(ONENABLE, this);
     }
 
     protected virtual void OnDisable()
     {
-        CallLifecycle("OnDisable");
+        CallFunction(ONDISABLE, this);
     }
 
     protected virtual void OnDestroy()
     {
-        CallLifecycle("OnDestroy");
+        CallFunction(ONDESTROY, this);
     }
 
-    protected void CallLifecycle(string functionName)
+    protected void CallFunction<T1>(string functionName, T1 arg1)
     {
-        if (m_LifeCycleFunction != null) {
-            m_LifeCycleFunction.Call(functionName);
+        if (m_LuaTable != null) {
+            m_LuaTable.Call(functionName, arg1);
         }
     }
 
-    protected void CallLifecycle<T1>(string functionName, T1 arg1)
+    protected void CallFunction<T1, T2>(string functionName, T1 arg1, T2 arg2)
     {
-        if (m_LifeCycleFunction != null) {
-            m_LifeCycleFunction.Call(functionName, arg1);
+        if (m_LuaTable != null) {
+            m_LuaTable.Call(functionName, arg1, arg2);
         }
     }
 
-    protected void CallLifecycle<T1, T2>(string functionName, T1 arg1, T2 arg2)
+    protected void CallFunction<T1, T2, T3>(string functionName, T1 arg1, T2 arg2, T3 arg3)
     {
-        if (m_LifeCycleFunction != null) {
-            m_LifeCycleFunction.Call(functionName, arg1, arg2);
+        if (m_LuaTable != null) {
+            m_LuaTable.Call(functionName, arg1, arg2, arg3);
         }
     }
 
-    protected void Call<T1>(string functionName, T1 arg1)
+    /// <summary>
+    /// 加载LUA脚本
+    /// </summary>
+    private void RequireLuaComponent()
     {
-        LuaManager.Instance.CallFunction(string.Format("{0}.{1}", m_LuaFile, functionName), arg1);
+        m_LuaTable = LuaManager.Instance.Require(m_LuaFile);
+        if (m_LuaTable == null) {
+            Debug.LogErrorFormat("failed to load [{0}] lua file", m_LuaFile);
+        }
     }
 
-    private void CallAwake()
+    /// <summary>
+    /// 绑定LUA脚本
+    /// </summary>
+    private void ExtendLuaComponent()
+    {
+        LuaTable helper = LuaManager.Instance.GetTable("Helper");
+        if (helper != null) {
+            helper.Call("Extend", this, m_LuaTable);
+        }
+    }
+
+    /// <summary>
+    /// 将Inspector面板上绑定的控件映射到LUA脚本中
+    /// </summary>
+    private void BindingComponentForLua()
     {
         if (m_Components.Length > 0) {
-            LuaTable tt = LuaManager.Instance.GetTemporaryTable();
             for (int i = 0; i < m_Components.Length; ++i) {
                 var cmpt = m_Components[i];
                 if (cmpt.transform != null && !string.IsNullOrEmpty(cmpt.name)) {
-                    tt[cmpt.name] = cmpt.transform.GetComponent(GetComponetType(cmpt.type));
+                    m_LuaTable[cmpt.name] = cmpt.transform.GetComponent(GetComponetType(cmpt.type));
                 }
             }
-            CallLifecycle("Awake", tt);
-            LuaManager.Instance.ReleaseTemporaryTable(tt);
         }
-        else {
-            CallLifecycle("Awake");
-        }
-    }
-    
-    public void AddEventHandler(LuaFunction function)
-    {
-        if (function == null || m_LifeCycleFunction == function) {
-            return;
-        }
-
-        if (m_LifeCycleFunction != null) {
-            m_LifeCycleFunction.Dispose();
-            m_LifeCycleFunction = null;
-        }
-        m_LifeCycleFunction = function;
     }
 }

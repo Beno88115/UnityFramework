@@ -1,15 +1,8 @@
 local LuaComponent = require "LuaComponent"
-UILua2Window = Component("UILua2Window", LuaComponent)
+local UILua2Window = Component("UILua2Window", LuaComponent)
 
-function UILua2Window.Extend(cmpt)
-	Helper.Extend(cmpt, UILua2Window)
-	Helper.AddEventHandler(cmpt)
-end
-
-function UILua2Window:Awake(ctrls)
-	self.txtTip = ctrls.txtTip
-	self.txtTip2 = ctrls.txtTip2
-	ctrls.btnClose:AddClick(Helper.Handler(self, UILua2Window.OnCloseButtonClicked))
+function UILua2Window:Awake()
+	self.btnClose:AddClick(Helper.Handler(self, UILua2Window.OnCloseButtonClicked))
 end
 
 function UILua2Window:Start()
@@ -44,3 +37,5 @@ end
 function UILua2Window:OnSendButtonClicked()
 	print("=====================send")
 end
+
+return UILua2Window

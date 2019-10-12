@@ -1,21 +1,14 @@
-local LuaComponent = require "LuaComponent"
-UILuaWindow = Component("UILuaWindow", LuaComponent)
+local UILuaWindow = Component("UILuaWindow")
 
-function UILuaWindow.Extend(cmpt)
-	Helper.Extend(cmpt, UILuaWindow)
-	Helper.AddEventHandler(cmpt)
-end
-
-function UILuaWindow:Awake(ctrls)
-	ctrls.btnClose:AddClick(Helper.Handler(self, UILuaWindow.OnCloseButtonClicked))
-	ctrls.btnSend:AddClick(Helper.Handler(self, UILuaWindow.OnSendButtonClicked))
-	ctrls.btnLua2:AddClick(Helper.Handler(self, UILuaWindow.OnLua2ButtonClicked))
+function UILuaWindow:Awake()
+	self.btnClose:AddClick(Helper.Handler(self, UILuaWindow.OnCloseButtonClicked))
+	self.btnSend:AddClick(Helper.Handler(self, UILuaWindow.OnSendButtonClicked))
+	self.btnLua2:AddClick(Helper.Handler(self, UILuaWindow.OnLua2ButtonClicked))
 end
 
 function UILuaWindow:Start()
 	print("==============start: " .. self.name)
 	print("==============go:" .. tostring(self.gameObject))
-	self.gameObject:GetLuaComponent("xxxx")
 end
 
 function UILuaWindow:OnEnable()
@@ -38,6 +31,10 @@ function UILuaWindow:OnOpen(userData)
 	print("==============onopen")
 end
 
+function UILuaWindow:OnClose(userData)
+	print("==============onclose")
+end
+
 function UILuaWindow:OnCloseButtonClicked()
 	UIManager.Instance:PopWindow(self.SerialId)
 end
@@ -51,9 +48,6 @@ function UILuaWindow:OnLua2ButtonClicked()
 	userData.tip = "TIP22222"
 	userData.tip2 = "XBB3333"
 	UIManager.Instance:PushWindow("UILua2", userData)
-
-	local xxx = GameObject.Instance(prefab)
-	-- local c = xxx.GetComponent("LuaBehaviour")
-	-- local lc = c.GetLuaCompnent('')
-	local lc2 = xxx.GetLuaComponent("")
 end
+
+return UILuaWindow

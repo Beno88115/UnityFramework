@@ -1,6 +1,10 @@
 local LuaComponent = Component("LuaComponent")
 
-function LuaComponent:Awake(ctrls)
+-- function UILua2Window.Extend(cmpt)
+-- 	Helper.Extend(cmpt, UILua2Window)
+-- end
+
+function LuaComponent:Awake()
 end
 
 function LuaComponent:Start()

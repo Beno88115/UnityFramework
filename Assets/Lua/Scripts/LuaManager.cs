@@ -54,6 +54,11 @@ public class LuaManager : SingletonMono<LuaManager>
         m_LuaState.DoFile(fileName);
     }
 
+    public LuaTable Require(string fileName)
+    {
+        return m_LuaState.Require<LuaTable>(fileName);
+    }
+
     public void CallFunction<T1>(string funcName, T1 arg1)
     {
         LuaFunction func = m_LuaState.GetFunction(funcName);
@@ -68,6 +73,11 @@ public class LuaManager : SingletonMono<LuaManager>
         if (func != null) {
             func.Call(arg1, arg2);
         }
+    }
+
+    public LuaTable GetTable(string tableName)
+    {
+        return m_LuaState.GetTable(tableName);
     }
 
     public LuaTable GetTemporaryTable()
