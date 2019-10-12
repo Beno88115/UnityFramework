@@ -6,7 +6,7 @@ using LuaInterface;
 
 public static class LuaButtonExtension 
 {
-    public static void AddClick2(this Button button, LuaFunction function)
+    public static void AddClick(this Button button, LuaFunction function)
     {
         if (function == null) {
             return;

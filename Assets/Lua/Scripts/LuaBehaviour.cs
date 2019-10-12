@@ -17,6 +17,7 @@ public partial class LuaBehaviour : MonoBehaviour
     private LuaTable m_LuaTable = null;
 
     public string LuaComponentName { get { return m_LuaFile; } }
+    public string LuaFile { get { return m_LuaFile; } set { m_LuaFile = value; } }
 
     protected virtual void Awake()
     {
@@ -46,6 +47,10 @@ public partial class LuaBehaviour : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
+        if (m_LuaTable != null) {
+            m_LuaTable.Dispose();
+            m_LuaTable = null;
+        }
         CallFunction(ONDESTROY, this);
     }
 

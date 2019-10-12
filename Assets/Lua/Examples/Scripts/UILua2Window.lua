@@ -3,6 +3,7 @@ local UILua2Window = Component("UILua2Window", LuaComponent)
 
 function UILua2Window:Awake()
 	self.btnClose:AddClick(Helper.Handler(self, UILua2Window.OnCloseButtonClicked))
+	self.btnShow:AddClick(Helper.Handler(self, UILua2Window.OnShowButtonClicked))
 end
 
 function UILua2Window:Start()
@@ -28,14 +29,15 @@ end
 function UILua2Window:OnOpen(userData)
 	self.txtTip.text = userData.tip
 	self.txtTip2.text = userData.tip2
+	self.imgIcon.sprite = nil
 end
 
 function UILua2Window:OnCloseButtonClicked()
 	UIManager.Instance:PopWindow(self.SerialId)
 end
 
-function UILua2Window:OnSendButtonClicked()
-	print("=====================send")
+function UILua2Window:OnShowButtonClicked()
+	self.imgIcon:SetSprite("Chess")
 end
 
 return UILua2Window

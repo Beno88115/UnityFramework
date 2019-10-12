@@ -76,7 +76,7 @@ public static class CustomSettings
         _GT(typeof(Material)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         _GT(typeof(Rigidbody)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         _GT(typeof(Camera)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
-        _GT(typeof(AudioSource)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
+        _GT(typeof(AudioSource)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)).AddExtendType(typeof(AudioSourceExtension)),
         //_GT(typeof(LineRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         //_GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),    
 #else
@@ -87,7 +87,7 @@ public static class CustomSettings
         _GT(typeof(Light)),
         _GT(typeof(Rigidbody)),
         _GT(typeof(Camera)),
-        _GT(typeof(AudioSource)),
+        _GT(typeof(AudioSource)).AddExtendType(typeof(AudioSourceExtension)),
         //_GT(typeof(LineRenderer))
         //_GT(typeof(TrailRenderer))
 #endif
@@ -152,11 +152,12 @@ public static class CustomSettings
         _GT(typeof(LuaProfiler)),
 
         _GT(typeof(LuaBehaviour)),
-        _GT(typeof(LuaButton)),
-        _GT(typeof(LuaText)),
         _GT(typeof(LuaWindow)),
         _GT(typeof(UIManager)),
         _GT(typeof(UIGroupType)),
+        _GT(typeof(UnityEngine.UI.Button)).AddExtendType(typeof(LuaButtonExtension)),
+        _GT(typeof(UnityEngine.UI.Text)).AddExtendType(typeof(TextExtension)),
+        _GT(typeof(UnityEngine.UI.Image)).AddExtendType(typeof(ImageExtension)),
     };
 
     public static List<Type> dynamicList = new List<Type>()

@@ -4,6 +4,7 @@ function UILuaWindow:Awake()
 	self.btnClose:AddClick(Helper.Handler(self, UILuaWindow.OnCloseButtonClicked))
 	self.btnSend:AddClick(Helper.Handler(self, UILuaWindow.OnSendButtonClicked))
 	self.btnLua2:AddClick(Helper.Handler(self, UILuaWindow.OnLua2ButtonClicked))
+	self.btnNormal:AddClick(Helper.Handler(self, UILuaWindow.OnNormalButtonClicked))
 end
 
 function UILuaWindow:Start()
@@ -41,6 +42,10 @@ end
 
 function UILuaWindow:OnSendButtonClicked()
 	print("=====================send")
+end
+
+function UILuaWindow:OnNormalButtonClicked()
+	print("=====================normal")
 end
 
 function UILuaWindow:OnLua2ButtonClicked()

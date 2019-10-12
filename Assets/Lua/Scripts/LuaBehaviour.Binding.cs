@@ -6,11 +6,10 @@ public partial class LuaBehaviour : MonoBehaviour
 {
     private enum ComponentType
     {
-        TRANSFORM,
-        BUTTON,
-        TEXT,
-        TEXT2,
-        BUTTON2,
+        Transform,
+        Button,
+        Text,
+        Image,
     }
 
     [Serializable]
@@ -26,11 +25,10 @@ public partial class LuaBehaviour : MonoBehaviour
     private void InitializeComponentInfos()
     {
         if (m_Types.Count == 0) {
-            m_Types.Add(ComponentType.BUTTON, typeof(LuaButton));
-            m_Types.Add(ComponentType.BUTTON2, typeof(UnityEngine.UI.Button));
-            m_Types.Add(ComponentType.TEXT, typeof(LuaText));
-            m_Types.Add(ComponentType.TEXT2, typeof(UnityEngine.UI.Text));
-            m_Types.Add(ComponentType.TRANSFORM, typeof(UnityEngine.Transform));
+            m_Types.Add(ComponentType.Text, typeof(UnityEngine.UI.Text));
+            m_Types.Add(ComponentType.Button, typeof(UnityEngine.UI.Button));
+            m_Types.Add(ComponentType.Image, typeof(UnityEngine.UI.Image));
+            m_Types.Add(ComponentType.Transform, typeof(UnityEngine.Transform));
         }
     }
 
@@ -39,6 +37,6 @@ public partial class LuaBehaviour : MonoBehaviour
         if (m_Types.ContainsKey(type)) {
             return m_Types[type];
         }
-        return m_Types[ComponentType.TRANSFORM];
+        return m_Types[ComponentType.Transform];
     }
 }
