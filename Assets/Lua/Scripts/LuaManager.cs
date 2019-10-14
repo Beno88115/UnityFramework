@@ -8,8 +8,6 @@ public class LuaManager : SingletonMono<LuaManager>
     private LuaState m_LuaState;
     private LuaLooper m_LuaLooper;
 
-    private int m_TempIndex = 0;
-
     protected override void Awake()
     {
         base.Awake();
@@ -78,21 +76,6 @@ public class LuaManager : SingletonMono<LuaManager>
     public LuaTable GetTable(string tableName)
     {
         return m_LuaState.GetTable(tableName);
-    }
-
-    public LuaTable GetTemporaryTable()
-    {
-        string tableName = string.Format("temporary_table{0}", m_TempIndex++);
-        m_LuaState.NewTable(tableName);
-        return m_LuaState.GetTable(tableName);
-    }
-
-    public void ReleaseTemporaryTable(LuaTable table)
-    {
-        if (table != null) {
-            table.Dispose();
-            table = null;
-        }
     }
 
     public void LuaGC() 

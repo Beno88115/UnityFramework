@@ -4,6 +4,7 @@ local UILua2Window = Component("UILua2Window", LuaComponent)
 function UILua2Window:Awake()
 	self.btnClose:AddClick(Helper.Handler(self, UILua2Window.OnCloseButtonClicked))
 	self.btnShow:AddClick(Helper.Handler(self, UILua2Window.OnShowButtonClicked))
+	self.btnLua3:AddClick(Helper.Handler(self, UILua2Window.OnLua3ButtonClicked))
 end
 
 function UILua2Window:Start()
@@ -38,6 +39,10 @@ end
 
 function UILua2Window:OnShowButtonClicked()
 	self.imgIcon:SetSprite("Chess")
+end
+
+function UILua2Window:OnLua3ButtonClicked()
+	UIManager.Instance:PushWindow("UILuaTableView")
 end
 
 return UILua2Window

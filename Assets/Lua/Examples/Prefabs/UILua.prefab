@@ -773,17 +773,17 @@ MonoBehaviour:
   m_LuaFile: UILuaWindow
   m_Components:
   - name: btnClose
-    transform: {fileID: 2451714098431568797}
-    type: 1
+    gameObject: {fileID: 9194780301428866383}
+    component: 2
   - name: btnSend
-    transform: {fileID: 5360819084123819895}
-    type: 1
+    gameObject: {fileID: 30595221809203276}
+    component: 2
   - name: btnLua2
-    transform: {fileID: 8790751646531427100}
-    type: 1
+    gameObject: {fileID: 7557410501015771333}
+    component: 2
   - name: btnNormal
-    transform: {fileID: 3229399169211372109}
-    type: 1
+    gameObject: {fileID: 2266195795307942208}
+    component: 2
 --- !u!1 &9194780301428866383
 GameObject:
   m_ObjectHideFlags: 0

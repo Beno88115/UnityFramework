@@ -153,6 +153,8 @@ public static class CustomSettings
 
         _GT(typeof(LuaBehaviour)),
         _GT(typeof(LuaWindow)),
+        _GT(typeof(LuaTableView)),
+        _GT(typeof(LuaTableViewCell)),
         _GT(typeof(UIManager)),
         _GT(typeof(UIGroupType)),
         _GT(typeof(UnityEngine.UI.Button)).AddExtendType(typeof(LuaButtonExtension)),

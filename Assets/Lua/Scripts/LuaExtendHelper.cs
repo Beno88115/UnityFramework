@@ -23,18 +23,23 @@ public class LuaExtendHelper
 
     public enum ComponentType
     {
-        Transform,
-        Button,
-        Text,
-        Image,
+        GameObject = 0,
+
+        Transform = 1,
+        Button = 2,
+        Text = 3,
+        Image = 4,
+
+        TableView = 1000,
+        TableViewCell = 1001,
     }
 
     [Serializable]
     public class ComponentBinding
     {
         public string name;
-        public Transform transform;
-        public ComponentType type;
+        public GameObject gameObject;
+        public ComponentType component;
     }
 
     private static Dictionary<ComponentType, Type> m_Types = new Dictionary<ComponentType, Type>();
@@ -64,6 +69,8 @@ public class LuaExtendHelper
             m_Types.Add(ComponentType.Button, typeof(UnityEngine.UI.Button));
             m_Types.Add(ComponentType.Image, typeof(UnityEngine.UI.Image));
             m_Types.Add(ComponentType.Transform, typeof(UnityEngine.Transform));
+            m_Types.Add(ComponentType.TableView, typeof(LuaTableView));
+            m_Types.Add(ComponentType.TableViewCell, typeof(LuaTableViewCell));
         }
     }
 
@@ -141,8 +148,13 @@ public class LuaExtendHelper
         if (m_Components.Length > 0) {
             for (int i = 0; i < m_Components.Length; ++i) {
                 var cmpt = m_Components[i];
-                if (cmpt.transform != null && !string.IsNullOrEmpty(cmpt.name)) {
-                    m_LuaTable[cmpt.name] = cmpt.transform.GetComponent(GetComponetType(cmpt.type));
+                if (cmpt.gameObject != null && !string.IsNullOrEmpty(cmpt.name)) {
+                    if (cmpt.component == ComponentType.GameObject) {
+                        m_LuaTable[cmpt.name] = cmpt.gameObject;
+                    }
+                    else {
+                        m_LuaTable[cmpt.name] = cmpt.gameObject.GetComponent(GetComponetType(cmpt.component));
+                    }
                 }
             }
         }
