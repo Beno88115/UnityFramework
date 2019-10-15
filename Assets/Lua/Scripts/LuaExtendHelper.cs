@@ -57,7 +57,7 @@ public class LuaExtendHelper
 
         InitializeComponentInfos();
 
-        RequireLuaComponent();
+        LoadLuaComponent();
         ExtendLuaComponent();
         BindingComponentForLua();
     }
@@ -121,9 +121,9 @@ public class LuaExtendHelper
     /// <summary>
     /// 加载LUA脚本
     /// </summary>
-    private void RequireLuaComponent()
+    private void LoadLuaComponent()
     {
-        m_LuaTable = LuaManager.Instance.Require(m_LuaFile);
+        m_LuaTable = LuaManager.Instance.DoFile<LuaTable>(m_LuaFile);
         if (m_LuaTable == null) {
             Debug.LogErrorFormat("failed to load [{0}] lua file", m_LuaFile);
         }

@@ -52,9 +52,9 @@ public class LuaManager : SingletonMono<LuaManager>
         m_LuaState.DoFile(fileName);
     }
 
-    public LuaTable Require(string fileName)
+    public T DoFile<T>(string fileName)
     {
-        return m_LuaState.Require<LuaTable>(fileName);
+        return m_LuaState.DoFile<T>(fileName);
     }
 
     public void CallFunction<T1>(string funcName, T1 arg1)
