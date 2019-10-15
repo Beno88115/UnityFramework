@@ -72,6 +72,10 @@ function Component(cmptname, ...)
 	return cls
 end
 
+LocalizationManager = LuaLocalizationManager
+GameObject = UnityEngine.GameObject
+Language = GameFramework.Localization.Language
+
 -- function class(classname, ...)
 --     local cls = {__cname = classname}
 

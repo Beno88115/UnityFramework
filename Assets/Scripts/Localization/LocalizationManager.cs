@@ -20,8 +20,8 @@ public partial class LocalizationManager : SingletonMono<LocalizationManager>
     {
         this.m_LocalizationModule = GameFrameworkEntry.GetModule<ILocalizationModule>();
         this.m_LocalizationModule.SetLocalizationHelper(new LocalizationHelper());
-        this.m_LocalizationModule.SetResourceModule(GameFrameworkEntry.GetModule<IResourceModule>());
-
+        this.m_LocalizationModule.SetResourceModule(GameFrameworkEntry.GetModule<IResourceModule>())
+;
         this.m_SettingModule = GameFrameworkEntry.GetModule<ISettingModule>();
 
         this.m_LocalizationModule.LoadDictionarySuccess += OnLoadDictionarySuccess;
@@ -39,7 +39,6 @@ public partial class LocalizationManager : SingletonMono<LocalizationManager>
         m_LoadLocalizedAssetFailureCallback = failureCallback;
         
         string localizedAssetName = this.m_SettingModule.GetString(kLocalizationPrefsKey, Utility.Enum.GetString(this.m_LocalizationModule.SystemLanguage));
-        Debug.Log(localizedAssetName);
         this.m_Language = Utility.Enum.GetEnum<GameFramework.Localization.Language>(localizedAssetName);
         this.m_LocalizationModule.LoadDictionary(localizedAssetName, LoadType.Text);
     }

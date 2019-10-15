@@ -160,6 +160,9 @@ public static class CustomSettings
         _GT(typeof(UnityEngine.UI.Button)).AddExtendType(typeof(LuaButtonExtension)),
         _GT(typeof(UnityEngine.UI.Text)).AddExtendType(typeof(TextExtension)),
         _GT(typeof(UnityEngine.UI.Image)).AddExtendType(typeof(ImageExtension)),
+
+        _GT(typeof(LuaLocalizationManager)),
+        _GT(typeof(GameFramework.Localization.Language)),
     };
 
     public static List<Type> dynamicList = new List<Type>()
