@@ -38,8 +38,7 @@ end
 function UILuaTableViewWindow:GetCellForRowInTableView(tableView, row)
 	local cell = self.tableView:GetReusableCell(self.tableViewCell.reuseIdentifier)
 	if not cell then
-		local go = UnityEngine.GameObject.Instantiate(self.tableViewCell)
-		cell = go:GetComponent("LuaTableViewCell")
+		cell = GameObject.Instantiate(self.tableViewCell):GetComponent("LuaTableViewCell")
 		cell.onOKClick = Helper.Handler(self, UILuaTableViewWindow.OnTableViewCellItemClicked)
 	end
 

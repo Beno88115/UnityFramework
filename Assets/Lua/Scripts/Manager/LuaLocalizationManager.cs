@@ -41,7 +41,6 @@ public class LuaLocalizationManager : Singleton<LuaLocalizationManager>
 
     private void OnLoadLocalizationSuccessCallback()
     {
-        Debug.Log("==============load localization success");
         if (m_LoadLocalizedAssetCompleteCallback != null) {
             m_LoadLocalizedAssetCompleteCallback.Call();
         }
@@ -49,7 +48,6 @@ public class LuaLocalizationManager : Singleton<LuaLocalizationManager>
 
     private void OnLoadLocalizationFailureCallback(string localizedAssetName, string errMessage)
     {
-        Debug.LogError("================err:" + errMessage);
         if (m_LoadLocalizedAssetFailureCallback != null) {
             m_LoadLocalizedAssetFailureCallback.Call(localizedAssetName, errMessage);
         }

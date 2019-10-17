@@ -24,7 +24,11 @@ function UILuaLocalizationWindow:OnCloseButtonClicked()
 end
 
 function UILuaLocalizationWindow:OnShowButtonClicked()
-	self.imgIcon:SetSprite("Chess")
+	-- self.imgIcon:SetSprite("Chess")
+
+	-- ResourceManager.Instance:LoadAsset("Chess", LuaType.Sprite, Helper.Handler(self, function(name, asset) 
+	-- 	self.imgIcon.sprite = asset
+	-- end))
 end
 
 function UILuaLocalizationWindow:OnLoadButtonClicked()

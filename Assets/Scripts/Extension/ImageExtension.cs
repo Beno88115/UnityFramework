@@ -5,7 +5,7 @@ public static class ImageExtension
 {
     public static void SetSprite(this Image image, string assetName)
     {
-        ResourceManager.Instance.LoadAsset(assetName, typeof(Sprite), (object asset)=>{
+        ResourceManager.Instance.LoadAsset(assetName, typeof(Sprite), (string name, object asset)=>{
             if (asset != null) {
                 image.sprite = (Sprite)asset;
             }
@@ -14,7 +14,7 @@ public static class ImageExtension
 
     public static void SetTexture(this RawImage image, string assetName)
     {
-        ResourceManager.Instance.LoadAsset(assetName, typeof(Texture2D), (object asset)=>{
+        ResourceManager.Instance.LoadAsset(assetName, typeof(Texture2D), (string name, object asset)=>{
             if (asset != null) {
                 image.texture = (Texture2D)asset;
             }

@@ -73,6 +73,7 @@ function Component(cmptname, ...)
 end
 
 LocalizationManager = LuaLocalizationManager
+ResourceManager = LuaResourceManager 
 GameObject = UnityEngine.GameObject
 Language = GameFramework.Localization.Language
 

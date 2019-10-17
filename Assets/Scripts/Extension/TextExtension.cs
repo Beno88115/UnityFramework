@@ -5,7 +5,7 @@ public static class TextExtension
 {
     public static void SetFont(this Text text, string assetName)
     {
-        ResourceManager.Instance.LoadAsset(assetName, typeof(Font), (object asset)=>{
+        ResourceManager.Instance.LoadAsset(assetName, typeof(Font), (string name, object asset)=>{
             if (asset != null) {
                 text.font = (Font)asset;
             }

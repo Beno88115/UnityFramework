@@ -163,6 +163,9 @@ public static class CustomSettings
 
         _GT(typeof(LuaLocalizationManager)),
         _GT(typeof(GameFramework.Localization.Language)),
+
+        _GT(typeof(LuaType)),
+        _GT(typeof(LuaResourceManager)),
     };
 
     public static List<Type> dynamicList = new List<Type>()

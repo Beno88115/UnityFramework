@@ -91,4 +91,9 @@ public class LuaManager : SingletonMono<LuaManager>
         m_LuaState.Dispose();
         m_LuaState = null;
     }
+
+    protected override bool IsGlobalScope
+    {
+        get { return true; }
+    }
 }

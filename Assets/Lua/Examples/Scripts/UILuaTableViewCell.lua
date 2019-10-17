@@ -5,10 +5,6 @@ function UITestLuaTableViewCell:Awake()
 	self.btnOK:AddClick(Helper.Handler(self, UITestLuaTableViewCell.OnOKButtonClicked))
 end
 
-function UITestLuaTableViewCell:Start()
-	print("===============id:" .. self.id)
-end
-
 function UITestLuaTableViewCell:SetID(id)
 	self.id = id
 	self.txtID.text = tostring(self.id)
