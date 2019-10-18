@@ -166,6 +166,7 @@ public static class CustomSettings
 
         _GT(typeof(LuaType)),
         _GT(typeof(LuaResourceManager)),
+        _GT(typeof(LuaSettingManager)),
     };
 
     public static List<Type> dynamicList = new List<Type>()

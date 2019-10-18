@@ -4,8 +4,6 @@ using GameFramework.Setting;
 
 public class SettingHelper : ISettingHelper
 {
-    private bool m_MarkChanged = false;
-
     /// <summary>
     /// 加载配置。
     /// </summary>
@@ -21,12 +19,8 @@ public class SettingHelper : ISettingHelper
     /// <returns>是否保存配置成功。</returns>
     public bool Save()
     {
-        if (m_MarkChanged) {
-            PlayerPrefs.Save();
-            m_MarkChanged = false;
-            return true;
-        }
-        return false;
+        PlayerPrefs.Save();
+        return true;
     }
 
     /// <summary>
@@ -85,7 +79,6 @@ public class SettingHelper : ISettingHelper
     public void SetBool(string settingName, bool value)
     {
         PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
-        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -117,7 +110,6 @@ public class SettingHelper : ISettingHelper
     public void SetInt(string settingName, int value)
     {
         PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
-        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -149,7 +141,6 @@ public class SettingHelper : ISettingHelper
     public void SetFloat(string settingName, float value)
     {
         PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
-        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -181,7 +172,6 @@ public class SettingHelper : ISettingHelper
     public void SetString(string settingName, string value)
     {
         PlayerPrefs.SetString(Encrypt(settingName), Encrypt(value));
-        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -238,7 +228,6 @@ public class SettingHelper : ISettingHelper
     /// <param name="obj">要写入的对象。</param>
     public void SetObject<T>(string settingName, T obj)
     {
-        m_MarkChanged = true;
     }
 
     /// <summary>
@@ -248,7 +237,6 @@ public class SettingHelper : ISettingHelper
     /// <param name="obj">要写入的对象。</param>
     public void SetObject(string settingName, object obj)
     {
-        m_MarkChanged = true;
     }
 
     private string Encrypt<T>(T value)

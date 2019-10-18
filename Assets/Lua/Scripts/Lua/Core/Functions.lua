@@ -74,6 +74,7 @@ end
 
 LocalizationManager = LuaLocalizationManager
 ResourceManager = LuaResourceManager 
+SettingManager = LuaSettingManager 
 GameObject = UnityEngine.GameObject
 Language = GameFramework.Localization.Language
 

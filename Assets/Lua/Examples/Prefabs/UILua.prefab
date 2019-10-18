@@ -199,7 +199,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Setting
 --- !u!1 &2266195795307942208
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 2673286606498318741}
   - component: {fileID: 5491855491675868386}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: BtnSetting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -781,7 +781,7 @@ MonoBehaviour:
   - name: btnTableView
     gameObject: {fileID: 7557410501015771333}
     component: 2
-  - name: btnNormal
+  - name: btnSetting
     gameObject: {fileID: 2266195795307942208}
     component: 2
 --- !u!1 &9194780301428866383

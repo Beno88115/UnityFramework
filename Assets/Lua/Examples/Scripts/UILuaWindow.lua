@@ -4,7 +4,7 @@ function UILuaWindow:Awake()
 	self.btnClose:AddClick(Helper.Handler(self, UILuaWindow.OnCloseButtonClicked))
 	self.btnLocalization:AddClick(Helper.Handler(self, UILuaWindow.OnLocalizationButtonClicked))
 	self.btnTableView:AddClick(Helper.Handler(self, UILuaWindow.OnTableViewButtonClicked))
-	self.btnNormal:AddClick(Helper.Handler(self, UILuaWindow.OnNormalButtonClicked))
+	self.btnSetting:AddClick(Helper.Handler(self, UILuaWindow.OnSettingButtonClicked))
 end
 
 function UILuaWindow:Start()
@@ -51,8 +51,10 @@ function UILuaWindow:OnTableViewButtonClicked()
 	UIManager.Instance:PushWindow("UILuaTableView")
 end
 
-function UILuaWindow:OnNormalButtonClicked()
-	print("=====================normal")
+function UILuaWindow:OnSettingButtonClicked()
+	local str = SettingManager.Instance:GetString("key111", "defaultValue")
+	print("===============setting str: " .. str)
+	SettingManager.Instance:SetString("key111", "lalala" .. tostring(os.time()))
 end
 
 return UILuaWindow
