@@ -6,7 +6,7 @@ using System;
 
 public class LuaResourceManager : Singleton<LuaResourceManager>
 {
-    private Dictionary<string, List<LuaFunction>> m_AssetBeingLoaded;
+    private Dictionary<string, List<LuaFunction>> m_AssetBeingLoaded = new Dictionary<string, List<LuaFunction>>();
 
     public void Initialize()
     {

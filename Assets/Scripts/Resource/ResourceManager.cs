@@ -163,7 +163,7 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
     private void OnLoadAssetFailureCallback(string assetName, LoadResourceStatus status, string errorMessage, object userData)
     {
-        Debug.LogError(errorMessage);
+        Debug.LogErrorFormat("[{0}] {1}", assetName, errorMessage);
 
         List<LoadResCallbacks> callbacks = null;
         if (m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
