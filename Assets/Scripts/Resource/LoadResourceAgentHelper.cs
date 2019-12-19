@@ -104,6 +104,17 @@ public class LoadResourceAgentHelper : MonoBehaviour, ILoadResourceAgentHelper
     /// <param name="loadType">资源加载方式。</param>
     public void ReadBytes(string fullPath, int loadType)
     {
+        if (m_LoadResourceAgentHelperReadFileCompleteEventHandler == null 
+            || m_LoadResourceAgentHelperUpdateEventHandler == null 
+            || m_LoadResourceAgentHelperErrorEventHandler == null) {
+            Debug.LogError("Load resource agent helper handler is invalid.");
+            return;
+        }
+        
+        m_BytesFullPath = fullPath;
+        m_LoadType = loadType;
+        m_UnityWebRequest = UnityEngine.Networking.UnityWebRequest.Get(fullPath);
+        m_UnityWebRequest.SendWebRequest();
     }
 
     /// <summary>
@@ -112,6 +123,14 @@ public class LoadResourceAgentHelper : MonoBehaviour, ILoadResourceAgentHelper
     /// <param name="bytes">要加载资源的二进制流。</param>
     public void ParseBytes(byte[] bytes)
     {
+        if (m_LoadResourceAgentHelperParseBytesCompleteEventHandler == null 
+            || m_LoadResourceAgentHelperUpdateEventHandler == null 
+            || m_LoadResourceAgentHelperErrorEventHandler == null) {
+            Debug.LogError("Load resource agent helper handler is invalid.");
+            return;
+        }
+
+        m_BytesAssetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(bytes);
     }
 
     /// <summary>
@@ -339,7 +358,7 @@ public class LoadResourceAgentHelper : MonoBehaviour, ILoadResourceAgentHelper
     {
         UpdateUnityWebRequest();
         UpdateFileAssetBundleCreateRequest();
-        // UpdateBytesAssetBundleCreateRequest();
+        UpdateBytesAssetBundleCreateRequest();
         UpdateAssetBundleRequest();
         UpdateAsyncOperation();
     }

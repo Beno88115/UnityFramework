@@ -25,8 +25,6 @@ public class AppFacade : SingletonMono<AppFacade>
         UIManager.Instance.Initialize();
         NetworkManager.Instance.Initialize();
         DataManager.Instance.Initialize();
-
-        ResourceManager.Instance.InitResources();
     }
 
     private void Update()

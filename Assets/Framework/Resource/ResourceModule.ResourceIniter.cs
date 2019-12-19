@@ -94,6 +94,8 @@ namespace GameFramework.Resource
                     m_ResourceModule.m_ResourceInfos = new Dictionary<ResourceName, ResourceInfo>(resourceCount, new ResourceNameComparer());
                     ResourceLength[] resourceLengths = new ResourceLength[resourceCount];
 
+                    LoadType loadType = (LoadType)int.Parse(root.GetAttribute("LoadType"));
+
                     for (int i = 0; i < resourceCount; i++)
                     {
                         XmlElement resourceElement = (XmlElement)root.ChildNodes[i];
@@ -102,7 +104,6 @@ namespace GameFramework.Resource
                         string variant = resourceElement.GetAttribute("Variant");
                         ResourceName resourceName = new ResourceName(name, variant);
 
-                        LoadType loadType = LoadType.LoadFromFile;
                         int length = int.Parse(resourceElement.GetAttribute("Length"));
                         int hashCode = int.Parse(resourceElement.GetAttribute("HashCode"));
                         byte[] hashCodeBytes = new byte[4];

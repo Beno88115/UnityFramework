@@ -19,13 +19,11 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
     private IResourceModule m_ResModule;
     private Dictionary<string, List<LoadAssetCompleteCallback>> m_AssetBeingLoaded;
     private LoadAssetCallbacks m_LoadAssetCallbacks;
-    private ResourceHelper m_ResHelper;
 
     protected override void Awake()
     {
         base.Awake();
 
-        m_ResHelper = gameObject.AddComponent<ResourceHelper>();
         m_AssetBeingLoaded = new Dictionary<string, List<LoadAssetCompleteCallback>>();
         m_LoadAssetCallbacks = new LoadAssetCallbacks(LoadAssetSuccessCallback, LoadAssetFailureCallback, LoadAssetUpdateCallback, LoadAssetDependencyAssetCallback);
     }
@@ -33,7 +31,7 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
     public void Initialize()
     {
         this.m_ResModule = GameFrameworkEntry.GetModule<IResourceModule>();
-        this.m_ResModule.SetResourceHelper(m_ResHelper);
+        this.m_ResModule.SetResourceHelper(gameObject.AddComponent<ResourceHelper>());
         this.m_ResModule.SetResourceSimulationHelper(new ResourceSimulationHelper());
 
         this.m_ResModule.SetDownloadModule(GameFrameworkEntry.GetModule<IDownloadModule>());
@@ -58,16 +56,21 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         }
     }
 
-    public void InitResources()
+    public void InitResources(InitResourcesCompleteCallback initResourcesCompleteCallback)
     {
 #if UNITY_EDITOR
         if (SimulateAssetBundleInEditor) {
             m_ResModule.InitSimulationResources();
+            if (initResourcesCompleteCallback != null) {
+                initResourcesCompleteCallback.Invoke();
+            }
             return;
         }
 #endif
         m_ResModule.InitResources(()=>{
-            Debug.Log("load resource manifest succeed!");
+            if (initResourcesCompleteCallback != null) {
+                initResourcesCompleteCallback.Invoke();
+            }
         });
     }
 

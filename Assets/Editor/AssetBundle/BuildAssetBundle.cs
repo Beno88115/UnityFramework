@@ -58,6 +58,7 @@ public static class BuildAssetBundles
 		root.SetAttribute("Version", "1.0.0");
 		root.SetAttribute("VersionCode", "1");
 		root.SetAttribute("GameVersion", "1");
+		root.SetAttribute("LoadType", target == BuildTarget.WebGL ? "1" : "0");
 		document.AppendChild(root);
 
 		int totalAssetCount = 0;
