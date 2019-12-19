@@ -5,8 +5,12 @@ using UnityEditor;
 using UnityEngine;
 using System;
 using GameFramework;
+#if UNITY_WEBGL && !UNITY_EDITOR
+using UnityEngine.Networking;
+using System.Collections;
+#endif
 
-public class ResourceHelper : IResourceHelper 
+public class ResourceHelper : MonoBehaviour, IResourceHelper 
 {
     /// <summary>
     /// 直接从指定文件路径读取数据流。
@@ -15,6 +19,9 @@ public class ResourceHelper : IResourceHelper
     /// <param name="loadBytesCallback">读取数据流回调函数。</param>
     public void LoadBytes(string fileUri, LoadBytesCallback loadBytesCallback)
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        StartCoroutine(LoadBytesForWebGL(fileUri, loadBytesCallback));
+#else
         if (!System.IO.File.Exists(fileUri)) {
             return;
         }
@@ -26,6 +33,7 @@ public class ResourceHelper : IResourceHelper
                 loadBytesCallback.Invoke(fileUri, bytes, null);
             }
         }
+#endif
     }
 
     /// <summary>
@@ -45,4 +53,28 @@ public class ResourceHelper : IResourceHelper
     public void Release(object objectToRelease)
     {
     }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    IEnumerator LoadBytesForWebGL(string fileUri, LoadBytesCallback loadBytesCallback)
+    {
+        var req = UnityWebRequest.Get(fileUri);
+        yield return req.SendWebRequest();
+
+        if (req.isNetworkError) {
+            if (loadBytesCallback != null) {
+                loadBytesCallback.Invoke(fileUri, null, req.error);
+            }
+            yield break;
+        }
+
+        var text = DownloadHandlerBuffer.GetContent(req);
+        Debug.Log(text);
+        if (!string.IsNullOrEmpty(text)) {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
+            if (loadBytesCallback != null) {
+                loadBytesCallback.Invoke(text, bytes, null);
+            }
+        }
+    }
+#endif
 }

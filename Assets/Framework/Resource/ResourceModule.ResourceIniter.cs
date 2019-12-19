@@ -80,7 +80,7 @@ namespace GameFramework.Resource
 
                 try 
                 {
-                    string text = System.Text.Encoding.Default.GetString(bytes);
+                    string text = System.Text.Encoding.UTF8.GetString(bytes);
                     XmlDocument xmlDocument = new XmlDocument();
                     xmlDocument.LoadXml(text);
 

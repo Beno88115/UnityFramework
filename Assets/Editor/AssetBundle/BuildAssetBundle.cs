@@ -37,6 +37,12 @@ public static class BuildAssetBundles
 		BuildAssetBundle(BuildTarget.Android);
 	}
 
+	[MenuItem("Tools/AssetBundles/Build AssetBundle/WebGL")]
+	static void BuildAssetBundleForWebGL()
+	{
+		BuildAssetBundle(BuildTarget.WebGL);
+	}
+
     static void BuildAssetBundle(BuildTarget target)
     {
         string outputPath = Path.Combine(kAssetBundleDirectory, GetPlatformName(target));
@@ -104,7 +110,10 @@ public static class BuildAssetBundles
 		root.SetAttribute("AssetCount", totalAssetCount.ToString());
 		
 		string filePath = Path.Combine(outputPath, "version");
-		document.Save(filePath);
+
+		var writer = new XmlTextWriter(filePath, new System.Text.UTF8Encoding(false));
+		document.Save(writer);
+		writer.Close();
 
 		CopyAssetBundlesTo(Application.streamingAssetsPath, target);
 		AssetDatabase.Refresh();
