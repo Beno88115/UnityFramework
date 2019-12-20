@@ -17,15 +17,15 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 #endif
 
     private IResourceModule m_ResModule;
-    private Dictionary<string, List<LoadAssetCompleteCallback>> m_AssetBeingLoaded;
+    private Dictionary<string, List<LoadResCallbacks>> m_AssetBeingLoaded;
     private LoadAssetCallbacks m_LoadAssetCallbacks;
 
     protected override void Awake()
     {
         base.Awake();
 
-        m_AssetBeingLoaded = new Dictionary<string, List<LoadAssetCompleteCallback>>();
-        m_LoadAssetCallbacks = new LoadAssetCallbacks(LoadAssetSuccessCallback, LoadAssetFailureCallback, LoadAssetUpdateCallback, LoadAssetDependencyAssetCallback);
+        m_AssetBeingLoaded = new Dictionary<string, List<LoadResCallbacks>>();
+        m_LoadAssetCallbacks = new LoadAssetCallbacks(OnLoadAssetSuccessCallback, OnLoadAssetFailureCallback, OnLoadAssetUpdateCallback, OnLoadAssetDependencyAssetCallback);
     }
 
     public void Initialize()
@@ -76,20 +76,20 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
 
     public void LoadAsset(string assetName, LoadAssetCompleteCallback callback)
     {
-        this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, null);
+        this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, null, null);
     }
 
     public void LoadAsset(string assetName, Type assetType, LoadAssetCompleteCallback callback)
     {
-        this.LoadAsset(assetName, assetType, callback, null);
+        this.LoadAsset(assetName, assetType, callback, null, null);
     }
 
     public void LoadAsset(string assetName, LoadAssetCompleteCallback callback, object userData)
     {
-        this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, userData);
+        this.LoadAsset(assetName, typeof(UnityEngine.Object), callback, null, userData);
     }
 
-    public void LoadAsset(string assetName, Type assetType, LoadAssetCompleteCallback callback, object userData)
+    public void LoadAsset(string assetName, Type assetType, LoadAssetCompleteCallback completeCallback, LoadAssetFailureCallback failureCallback, object userData)
     {
         if (string.IsNullOrEmpty(assetName)) {
             throw new GameFrameworkException("asset name is invalid.");
@@ -99,33 +99,35 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
             throw new GameFrameworkException("asset type is invalid.");
         }
 
-        if (callback == null) {
+        if (completeCallback == null) {
             throw new GameFrameworkException("callback is invalid.");
         }
 
-        if (m_AssetBeingLoaded.ContainsKey(assetName)) {
-            throw new GameFrameworkException("asset is loading.");
-        }
-
-        // ResObject resObject = m_ObjectPool.Spawn(assetName);
-        // if (resObject == null)
-        // {
-        //     m_AssetBeingLoaded.Add(assetName, callback);
-        //     m_ResModule.LoadAsset(assetName, GameFramework.Resource.Constant.DefaultPriority, m_LoadAssetCallbacks, userData);
-        // }
-        // else
-        // {
-        //     callback(resObject.Target);
-        // }
-
-        List<LoadAssetCompleteCallback> callbacks = null;
+        bool isLoading = false;
+        List<LoadResCallbacks> callbacks = null;
         if (!m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
-            callbacks = new List<LoadAssetCompleteCallback>();
-            m_AssetBeingLoaded[assetName] = callbacks;
+            callbacks = new List<LoadResCallbacks>();
         }
-        callbacks.Add(callback);
+        else {
+            isLoading = true;
+        }
 
-        m_ResModule.LoadAsset(assetName, assetType, m_LoadAssetCallbacks, userData);
+        for (int i = 0; i < callbacks.Count; ++i) {
+            var cb = callbacks[i];
+            if (cb.LoadAssetCompleteCallback == completeCallback) {
+                return;
+            }
+            if (failureCallback != null && (cb.LoadAssetFailureCallback == failureCallback)) {
+                return;
+            }
+        }
+
+        callbacks.Add(new LoadResCallbacks(completeCallback, failureCallback));
+        m_AssetBeingLoaded[assetName] = callbacks;
+
+        if (!isLoading) {
+            m_ResModule.LoadAsset(assetName, assetType, m_LoadAssetCallbacks, userData);
+        }
     }
 
     private void OnResourceUpdateStart(object sender, GameFramework.Resource.ResourceUpdateStartEventArgs e)
@@ -144,32 +146,45 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
     {
     }
 
-    private void LoadAssetSuccessCallback(string assetName, object assetObject, float duration, object userData)
+    private void OnLoadAssetSuccessCallback(string assetName, object assetObject, float duration, object userData)
     {
-        List<LoadAssetCompleteCallback> callbacks = null;
+        List<LoadResCallbacks> callbacks = null;
         if (m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
             if (callbacks != null) {
                 for (int i = 0; i < callbacks.Count; ++i) {
-                    LoadAssetCompleteCallback callback = callbacks[i];
+                    LoadResCallbacks callback = callbacks[i];
                     if (callback != null) {
-                        callback(assetObject);
+                        callback.LoadAssetCompleteCallback(assetName, assetObject);
                     }
                 }
+                callbacks.Clear();
             }
             m_AssetBeingLoaded.Remove(assetName);
         }
     }
 
-    private void LoadAssetFailureCallback(string assetName, LoadResourceStatus status, string errorMessage, object userData)
+    private void OnLoadAssetFailureCallback(string assetName, LoadResourceStatus status, string errorMessage, object userData)
     {
-        Debug.LogError(errorMessage);
+        List<LoadResCallbacks> callbacks = null;
+        if (m_AssetBeingLoaded.TryGetValue(assetName, out callbacks)) {
+            if (callbacks != null) {
+                for (int i = 0; i < callbacks.Count; ++i) {
+                    LoadResCallbacks callback = callbacks[i];
+                    if (callback != null && callback.LoadAssetFailureCallback != null) {
+                        callback.LoadAssetFailureCallback(assetName, errorMessage);
+                    }
+                }
+                callbacks.Clear();
+            }
+            m_AssetBeingLoaded.Remove(assetName);
+        } 
     }
 
-    private void LoadAssetUpdateCallback(string assetName, float progress, object userData)
+    private void OnLoadAssetUpdateCallback(string assetName, float progress, object userData)
     {
     }
 
-    private void LoadAssetDependencyAssetCallback(string assetName, string dependencyAssetName, int loadedCount, int totalCount, object userData)
+    private void OnLoadAssetDependencyAssetCallback(string assetName, string dependencyAssetName, int loadedCount, int totalCount, object userData)
     {
     }
 

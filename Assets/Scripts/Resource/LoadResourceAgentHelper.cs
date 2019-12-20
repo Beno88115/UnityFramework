@@ -113,7 +113,8 @@ public class LoadResourceAgentHelper : MonoBehaviour, ILoadResourceAgentHelper
         
         m_BytesFullPath = fullPath;
         m_LoadType = loadType;
-        m_UnityWebRequest = UnityEngine.Networking.UnityWebRequest.Get(fullPath);
+
+        m_UnityWebRequest = UnityEngine.Networking.UnityWebRequest.Get(Utility.Path.GetRemotePath(fullPath));
         m_UnityWebRequest.SendWebRequest();
     }
 
