@@ -54,6 +54,9 @@ public partial class ResourceManager : SingletonMono<ResourceManager>
         for (int i = 0; i < AppConst.kResourceAgentCount; ++i) {
             this.m_ResModule.AddLoadResourceAgentHelper(gameObject.AddComponent<LoadResourceAgentHelper>());
         }
+
+        // set variant for specific platform or device
+        // this.m_ResModule.SetCurrentVariant("");
     }
 
     public void InitResources(InitResourcesCompleteCallback initResourcesCompleteCallback)
